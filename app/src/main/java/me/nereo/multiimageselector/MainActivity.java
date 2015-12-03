@@ -1,7 +1,6 @@
 package me.nereo.multiimageselector;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -13,14 +12,48 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.OnClick;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppActivity {
 
     private static final int REQUEST_IMAGE = 2;
 
-    private TextView mResultText;
-    private RadioGroup mChoiceMode, mShowCamera;
-    private EditText mRequestNum;
+    @Bind(R.id.result) TextView mResultText;
+    @Bind(R.id.choice_mode) RadioGroup mChoiceMode;
+    @Bind(R.id.show_camera) RadioGroup mShowCamera;
+    @Bind(R.id.request_num) EditText mRequestNum;
+
+    @OnClick(R.id.button)
+    void onPickButtonClick(View v) {
+        int selectedMode = MultiImageSelectorActivity.MODE_MULTI;
+
+        if (mChoiceMode.getCheckedRadioButtonId() == R.id.single){
+            selectedMode = MultiImageSelectorActivity.MODE_SINGLE;
+        } else {
+            selectedMode = MultiImageSelectorActivity.MODE_MULTI;
+        }
+
+        boolean showCamera = mShowCamera.getCheckedRadioButtonId() == R.id.show;
+
+        int maxNum = MultiImageSelectorActivity.DEFAULT_MAX_COUNT;
+        if(!TextUtils.isEmpty(mRequestNum.getText())){
+            maxNum = Integer.valueOf(mRequestNum.getText().toString());
+        }
+
+        Intent intent = new Intent(MainActivity.this, MultiImageSelectorActivity.class);
+        // 是否显示拍摄图片
+        intent.putExtra(MultiImageSelectorActivity.EXTRA_SHOW_CAMERA, showCamera);
+        // 最大可选择图片数量
+        intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_COUNT, maxNum);
+        // 选择模式
+        intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_MODE, selectedMode);
+        // 默认选择
+        if(mSelectPath != null && mSelectPath.size() > 0){
+            intent.putExtra(MultiImageSelectorActivity.EXTRA_DEFAULT_SELECTED_LIST, mSelectPath);
+        }
+        startActivityForResult(intent, REQUEST_IMAGE);
+    }
 
     private ArrayList<String> mSelectPath;
 
@@ -28,66 +61,23 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        mResultText = (TextView) findViewById(R.id.result);
-        mChoiceMode = (RadioGroup) findViewById(R.id.choice_mode);
-        mShowCamera = (RadioGroup) findViewById(R.id.show_camera);
-        mRequestNum = (EditText) findViewById(R.id.request_num);
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
         mChoiceMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                if(checkedId == R.id.multi){
+                if (checkedId == R.id.multi) {
                     mRequestNum.setEnabled(true);
-                }else{
+                } else {
                     mRequestNum.setEnabled(false);
                     mRequestNum.setText("");
                 }
             }
         });
-
-        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                int selectedMode = MultiImageSelectorActivity.MODE_MULTI;
-
-                if(mChoiceMode.getCheckedRadioButtonId() == R.id.single){
-                    selectedMode = MultiImageSelectorActivity.MODE_SINGLE;
-                }else{
-                    selectedMode = MultiImageSelectorActivity.MODE_MULTI;
-                }
-
-                boolean showCamera = mShowCamera.getCheckedRadioButtonId() == R.id.show;
-
-                int maxNum = 9;
-                if(!TextUtils.isEmpty(mRequestNum.getText())){
-                    maxNum = Integer.valueOf(mRequestNum.getText().toString());
-                }
-
-                Intent intent = new Intent(MainActivity.this, MultiImageSelectorActivity.class);
-                // 是否显示拍摄图片
-                intent.putExtra(MultiImageSelectorActivity.EXTRA_SHOW_CAMERA, showCamera);
-                // 最大可选择图片数量
-                intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_COUNT, maxNum);
-                // 选择模式
-                intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_MODE, selectedMode);
-                // 默认选择
-                if(mSelectPath != null && mSelectPath.size()>0){
-                    intent.putExtra(MultiImageSelectorActivity.EXTRA_DEFAULT_SELECTED_LIST, mSelectPath);
-                }
-                startActivityForResult(intent, REQUEST_IMAGE);
-
-            }
-        });
-
-/*        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, GestureImageActivity.class);
-                startActivity(intent);
-            }
-        });*/
     }
 
     @Override
