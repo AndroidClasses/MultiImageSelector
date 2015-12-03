@@ -22,7 +22,7 @@
 ```xml
 <activity
     android:configChanges="orientation|screenSize"
-    android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity" />
+    android:name="me.nereo.multiimageselector.MultiImageSelectorActivity" />
 ```
 
 * 第2步
