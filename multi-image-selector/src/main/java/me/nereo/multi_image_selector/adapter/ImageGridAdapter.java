@@ -214,6 +214,16 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
             indicator = (ImageView) view.findViewById(R.id.checkmark);
             mask = view.findViewById(R.id.mask);
             view.setTag(this);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (null != recyclerListener) {
+                        Image image = getDataItem(getAdapterPosition());
+                        performClicked(mHolder, image);
+                    }
+                }
+            });
         }
 
         void bindData(final Image data){
@@ -248,7 +258,6 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
         }
     }
 
-    private RecyclerClickListener recyclerListener;
     protected ImageAdapterViewHolder mHolder;
     @Override
     public ImageAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -263,25 +272,29 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
             mHolder = new ImageAdapterViewHolder(rootView);
         } else {
             // unknown view type, go to the hell
+            mHolder = null;
         }
 
         return mHolder;
     }
 
-//    protected void performClicked(ImageAdapterViewHolder holder, int position) {
-//        if (null != recyclerListener) {
-//            Image image = position == 0 ? null : mImages.get(position -1);
-//            recyclerListener.onElementClick(holder, image);
-//        }
-//    }
+    protected void performClicked(ImageAdapterViewHolder holder, Image image) {
+        if (null != recyclerListener) {
+            recyclerListener.onElementClick(holder, image);
+        }
+    }
 
-    @Override
-    public void onBindViewHolder(ImageAdapterViewHolder holder, int position) {
+    private Image getDataItem(int position) {
         if (TYPE_NORMAL == getItemViewType(position)) {
-            holder.bindData(mImages.get(position -1));
+            return mImages.get(position -1);
         } else {
             // need not to bind for camera type or others.
+            return null;
         }
+    }
+    @Override
+    public void onBindViewHolder(ImageAdapterViewHolder holder, int position) {
+        holder.bindData(getDataItem(position));
     }
 
     @Override
@@ -289,6 +302,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
         return showCamera ? 1 + mImages.size() : mImages.size();
     }
 
+    private RecyclerClickListener recyclerListener;
     public void setOnItemClickListener(RecyclerClickListener recyclerListener) {
         this.recyclerListener = recyclerListener;
     }

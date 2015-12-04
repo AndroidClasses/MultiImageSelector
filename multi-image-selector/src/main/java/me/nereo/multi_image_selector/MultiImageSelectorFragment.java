@@ -30,6 +30,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,7 @@ import me.nereo.multi_image_selector.adapter.RecyclerClickListener;
 import me.nereo.multi_image_selector.bean.Folder;
 import me.nereo.multi_image_selector.bean.Image;
 import me.nereo.multi_image_selector.utils.FileUtils;
+import me.nereo.multi_image_selector.utils.TimeUtils;
 
 /**
  * 图片选择Fragment
@@ -185,27 +188,28 @@ public class MultiImageSelectorFragment extends Fragment {
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 3);
         mGridView.setLayoutManager(layoutManager);
 
-//        mGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(AbsListView absListView, int state) {
-//
-//                final Picasso picasso = Picasso.with(getActivity());
-//                if(state == SCROLL_STATE_IDLE || state == SCROLL_STATE_TOUCH_SCROLL){
-//                    picasso.resumeTag(getActivity());
-//                }else{
-//                    picasso.pauseTag(getActivity());
-//                }
-//
-//                if(state == SCROLL_STATE_IDLE){
-//                    // 停止滑动，日期指示器消失
-//                    mTimeLineText.setVisibility(View.GONE);
-//                }else if(state == SCROLL_STATE_FLING){
-//                    mTimeLineText.setVisibility(View.VISIBLE);
-//                }
-//            }
-//
-//            @Override
-//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        mGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView absListView, int state) {
+
+                final Picasso picasso = Picasso.with(getActivity());
+                if(state == RecyclerView.SCROLL_STATE_IDLE || state == RecyclerView.SCROLL_STATE_DRAGGING){
+                    picasso.resumeTag(getActivity());
+                }else{
+                    picasso.pauseTag(getActivity());
+                }
+
+                if(state == RecyclerView.SCROLL_STATE_IDLE){
+                    // 停止滑动，日期指示器消失
+                    mTimeLineText.setVisibility(View.GONE);
+                } else if(state == RecyclerView.SCROLL_STATE_SETTLING){
+                    mTimeLineText.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                // todo: what to do it
 //                if(mTimeLineText.getVisibility() == View.VISIBLE) {
 //                    int index = firstVisibleItem + 1 == view.getAdapter().getCount() ? view.getAdapter().getCount() - 1 : firstVisibleItem + 1;
 //                    Image image = (Image) view.getAdapter().getItem(index);
@@ -213,8 +217,8 @@ public class MultiImageSelectorFragment extends Fragment {
 //                        mTimeLineText.setText(TimeUtils.formatPhotoDate(image.path));
 //                    }
 //                }
-//            }
-//        });
+            }
+        });
 
         mGridView.setAdapter(mImageAdapter);
         mGridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
