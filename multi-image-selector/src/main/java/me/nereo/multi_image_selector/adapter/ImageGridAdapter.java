@@ -2,6 +2,7 @@ package me.nereo.multi_image_selector.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.LayoutParams;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,13 +36,13 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     private List<Image> mSelectedImages = new ArrayList<>();
 
     private int mItemSize;
-//    private GridView.LayoutParams mItemLayoutParams;
+    private LayoutParams mItemLayoutParams;
 
     public ImageGridAdapter(Context context, boolean showCamera){
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.showCamera = showCamera;
-//        mItemLayoutParams = new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT);
+        mItemLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
     /**
      * 显示选择指示器
@@ -129,7 +130,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
         mItemSize = columnWidth;
 
-//        mItemLayoutParams = new GridView.LayoutParams(mItemSize, mItemSize);
+        mItemLayoutParams = new LayoutParams(mItemSize, mItemSize);
 
         notifyDataSetChanged();
     }
@@ -209,6 +210,8 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
         ImageAdapterViewHolder(View view) {
             super(view);
+
+            view.setLayoutParams(mItemLayoutParams);
 
             image = (ImageView) view.findViewById(R.id.image);
             indicator = (ImageView) view.findViewById(R.id.checkmark);
