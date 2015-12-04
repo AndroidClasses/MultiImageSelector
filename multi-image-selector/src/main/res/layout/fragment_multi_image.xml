@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@android:color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <GridView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:horizontalSpacing="@dimen/space_size"
-        android:verticalSpacing="@dimen/space_size"
-        android:paddingBottom="?android:attr/actionBarSize"
-        android:clipToPadding="false"
         android:numColumns="auto_fit"
-        android:columnWidth="@dimen/image_size"/>
+        android:paddingBottom="?android:attr/actionBarSize"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        />
+    <!--<GridView-->
+        <!--android:id="@+id/grid"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:horizontalSpacing="@dimen/space_size"-->
+        <!--android:verticalSpacing="@dimen/space_size"-->
+        <!--android:paddingBottom="?android:attr/actionBarSize"-->
+        <!--android:clipToPadding="false"-->
+        <!--android:numColumns="auto_fit"-->
+        <!--android:columnWidth="@dimen/image_size"/>-->
 
     <TextView
         android:id="@+id/timeline_area"

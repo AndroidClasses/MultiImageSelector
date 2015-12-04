@@ -1,15 +1,13 @@
 package me.nereo.multi_image_selector.adapter;
 
 import android.content.Context;
-import android.text.TextUtils;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -23,7 +21,7 @@ import me.nereo.multi_image_selector.bean.Image;
  * 图片Adapter
  * Created by Nereo on 2015/4/7.
  */
-public class ImageGridAdapter extends BaseAdapter {
+public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.ImageAdapterViewHolder> {
 
     private static final int TYPE_CAMERA = 0;
     private static final int TYPE_NORMAL = 1;
@@ -180,15 +178,15 @@ public class ImageGridAdapter extends BaseAdapter {
             view = mInflater.inflate(R.layout.list_item_camera, viewGroup, false);
             view.setTag(null);
         }else if(type == TYPE_NORMAL){
-            ViewHolde holde;
+            ImageAdapterViewHolder holde;
             if(view == null){
                 view = mInflater.inflate(R.layout.list_item_image, viewGroup, false);
-                holde = new ViewHolde(view);
+                holde = new ImageAdapterViewHolder(view);
             }else{
-                holde = (ViewHolde) view.getTag();
+                holde = (ImageAdapterViewHolder) view.getTag();
                 if(holde == null){
                     view = mInflater.inflate(R.layout.list_item_image, viewGroup, false);
-                    holde = new ViewHolde(view);
+                    holde = new ImageAdapterViewHolder(view);
                 }
             }
             if(holde != null) {
@@ -205,12 +203,14 @@ public class ImageGridAdapter extends BaseAdapter {
         return view;
     }
 
-    class ViewHolde {
+    class ImageAdapterViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         ImageView indicator;
         View mask;
 
-        ViewHolde(View view){
+        ImageAdapterViewHolder(View view) {
+            super(view);
+
             image = (ImageView) view.findViewById(R.id.image);
             indicator = (ImageView) view.findViewById(R.id.checkmark);
             mask = view.findViewById(R.id.mask);
@@ -249,4 +249,33 @@ public class ImageGridAdapter extends BaseAdapter {
         }
     }
 
+    private RecyclerClickListener recyclerListener;
+    protected ImageAdapterViewHolder mHolder;
+    @Override
+    public ImageAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View rootView = LayoutInflater.from(mContext).inflate(mItemLayoutId, parent, false);
+        mHolder = new ImageAdapterViewHolder(rootView);
+
+        return mHolder;
+    }
+
+    protected void performClicked(ImageAdapterViewHolder holder, int position) {
+        if (null != recyclerListener) {
+            recyclerListener.onElementClick(holder, position);
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(ImageAdapterViewHolder holder, int position) {
+        holder.bindData(mDatas.get(position), null);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mDatas.size();
+    }
+
+    public void setOnItemClickListener(RecyclerClickListener recyclerListener) {
+        this.recyclerListener = recyclerListener;
+    }
 }

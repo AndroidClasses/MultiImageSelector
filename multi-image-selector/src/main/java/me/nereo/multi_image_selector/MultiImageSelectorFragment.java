@@ -17,7 +17,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.ListPopupWindow;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +28,6 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,7 +77,7 @@ public class MultiImageSelectorFragment extends Fragment {
     private ArrayList<Folder> mResultFolder = new ArrayList<>();
 
     // 图片Grid
-    private GridView mGridView;
+    private RecyclerView mGridView;
     private Callback mCallback;
 
     private ImageGridAdapter mImageAdapter;
@@ -182,8 +183,12 @@ public class MultiImageSelectorFragment extends Fragment {
             }
         });
 
-        mGridView = (GridView) view.findViewById(R.id.grid);
-        mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        mGridView = (RecyclerView) view.findViewById(R.id.grid);
+
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        mGridView.setLayoutManager(layoutManager);
+
+        mGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int state) {
 
@@ -213,6 +218,7 @@ public class MultiImageSelectorFragment extends Fragment {
                 }
             }
         });
+
         mGridView.setAdapter(mImageAdapter);
         mGridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -237,6 +243,8 @@ public class MultiImageSelectorFragment extends Fragment {
                 }
             }
         });
+
+        mImageAdapter.setOnItemClickListener() {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

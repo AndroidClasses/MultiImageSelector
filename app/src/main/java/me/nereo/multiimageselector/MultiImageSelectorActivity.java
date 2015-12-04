@@ -5,13 +5,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import butterknife.Bind;
-import butterknife.OnClick;
 import me.nereo.multi_image_selector.MultiImageSelectorFragment;
 
 /**
