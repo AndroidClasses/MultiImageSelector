@@ -39,12 +39,12 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
     /** default max selection count **/
     public static final int DEFAULT_MAX_COUNT = 9;
 
-    @Bind(R.id.commit) Button mSubmitButton;
-    @OnClick(R.id.btn_back)
-    void onBackClicked() {
-        setResult(RESULT_CANCELED);
-        finish();
-    }
+//    @Bind(R.id.commit) Button mSubmitButton;
+//    @OnClick(R.id.btn_back)
+//    void onBackClicked() {
+//        setResult(RESULT_CANCELED);
+//        finish();
+//    }
     @OnClick(R.id.commit)
     void onSelectionSubmit() {
         if(resultList != null && resultList.size() > 0){
@@ -92,9 +92,9 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
 
     private void refreshWithResultUi() {
         // 完成按钮
-        boolean haveResult = resultList != null && !resultList.isEmpty();
-        mSubmitButton.setText(getSelectedResult(haveResult));
-        mSubmitButton.setEnabled(haveResult);
+//        boolean haveResult = resultList != null && !resultList.isEmpty();
+//        mSubmitButton.setText(getSelectedResult(haveResult));
+//        mSubmitButton.setEnabled(haveResult);
         invalidateOptionsMenu();
     }
 
