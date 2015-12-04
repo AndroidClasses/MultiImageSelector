@@ -45,7 +45,7 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
 //        setResult(RESULT_CANCELED);
 //        finish();
 //    }
-    @OnClick(R.id.commit)
+//    @OnClick(R.id.commit)
     void onSelectionSubmit() {
         if(resultList != null && resultList.size() > 0){
             // 返回已选择的图片数据
