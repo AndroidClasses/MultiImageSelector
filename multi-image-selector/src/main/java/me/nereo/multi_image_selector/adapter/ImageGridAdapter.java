@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -36,13 +35,13 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     private List<Image> mSelectedImages = new ArrayList<>();
 
     private int mItemSize;
-    private GridView.LayoutParams mItemLayoutParams;
+//    private GridView.LayoutParams mItemLayoutParams;
 
     public ImageGridAdapter(Context context, boolean showCamera){
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.showCamera = showCamera;
-        mItemLayoutParams = new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT);
+//        mItemLayoutParams = new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT);
     }
     /**
      * 显示选择指示器
@@ -130,80 +129,80 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
         mItemSize = columnWidth;
 
-        mItemLayoutParams = new GridView.LayoutParams(mItemSize, mItemSize);
+//        mItemLayoutParams = new GridView.LayoutParams(mItemSize, mItemSize);
 
         notifyDataSetChanged();
     }
 
-    @Override
-    public int getViewTypeCount() {
-        return 2;
-    }
+//    @Override
+//    public int getViewTypeCount() {
+//        return 2;
+//    }
 
     @Override
     public int getItemViewType(int position) {
         if(showCamera){
-            return position==0 ? TYPE_CAMERA : TYPE_NORMAL;
+            return position == 0 ? TYPE_CAMERA : TYPE_NORMAL;
         }
         return TYPE_NORMAL;
     }
 
-    @Override
-    public int getCount() {
-        return showCamera ? mImages.size()+1 : mImages.size();
-    }
+//    @Override
+//    public int getCount() {
+//        return showCamera ? mImages.size()+1 : mImages.size();
+//    }
+//
+//    @Override
+//    public Image getItem(int i) {
+//        if(showCamera){
+//            if(i == 0){
+//                return null;
+//            }
+//            return mImages.get(i-1);
+//        }else{
+//            return mImages.get(i);
+//        }
+//    }
+//
+//    @Override
+//    public long getItemId(int i) {
+//        return i;
+//    }
+//
+//    @Override
+//    public View getView(int i, View view, ViewGroup viewGroup) {
+//
+//        int type = getItemViewType(i);
+//        if(type == TYPE_CAMERA){
+//            view = mInflater.inflate(R.layout.list_item_camera, viewGroup, false);
+//            view.setTag(null);
+//        }else if(type == TYPE_NORMAL){
+//            ImageAdapterViewHolder holde;
+//            if(view == null){
+//                view = mInflater.inflate(R.layout.list_item_image, viewGroup, false);
+//                holde = new ImageAdapterViewHolder(view);
+//            }else{
+//                holde = (ImageAdapterViewHolder) view.getTag();
+//                if(holde == null){
+//                    view = mInflater.inflate(R.layout.list_item_image, viewGroup, false);
+//                    holde = new ImageAdapterViewHolder(view);
+//                }
+//            }
+//            if(holde != null) {
+//                holde.bindData(getItem(i));
+//            }
+//        }
+//
+//        /** Fixed View Size */
+//        GridView.LayoutParams lp = (GridView.LayoutParams) view.getLayoutParams();
+//        if(lp.height != mItemSize){
+//            view.setLayoutParams(mItemLayoutParams);
+//        }
+//
+//        return view;
+//    }
 
-    @Override
-    public Image getItem(int i) {
-        if(showCamera){
-            if(i == 0){
-                return null;
-            }
-            return mImages.get(i-1);
-        }else{
-            return mImages.get(i);
-        }
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-
-        int type = getItemViewType(i);
-        if(type == TYPE_CAMERA){
-            view = mInflater.inflate(R.layout.list_item_camera, viewGroup, false);
-            view.setTag(null);
-        }else if(type == TYPE_NORMAL){
-            ImageAdapterViewHolder holde;
-            if(view == null){
-                view = mInflater.inflate(R.layout.list_item_image, viewGroup, false);
-                holde = new ImageAdapterViewHolder(view);
-            }else{
-                holde = (ImageAdapterViewHolder) view.getTag();
-                if(holde == null){
-                    view = mInflater.inflate(R.layout.list_item_image, viewGroup, false);
-                    holde = new ImageAdapterViewHolder(view);
-                }
-            }
-            if(holde != null) {
-                holde.bindData(getItem(i));
-            }
-        }
-
-        /** Fixed View Size */
-        GridView.LayoutParams lp = (GridView.LayoutParams) view.getLayoutParams();
-        if(lp.height != mItemSize){
-            view.setLayoutParams(mItemLayoutParams);
-        }
-
-        return view;
-    }
-
-    class ImageAdapterViewHolder extends RecyclerView.ViewHolder {
+    public class ImageAdapterViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         ImageView indicator;
         View mask;
@@ -252,27 +251,42 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     private RecyclerClickListener recyclerListener;
     protected ImageAdapterViewHolder mHolder;
     @Override
-    public ImageAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(mContext).inflate(mItemLayoutId, parent, false);
-        mHolder = new ImageAdapterViewHolder(rootView);
+    public ImageAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+//        View rootView = LayoutInflater.from(mContext).inflate(mItemLayoutId, parent, false);
+//        mHolder = new ImageAdapterViewHolder(rootView);
+
+        if (viewType == TYPE_CAMERA){
+            View rootView = mInflater.inflate(R.layout.list_item_camera, viewGroup, false);
+            mHolder = new ImageAdapterViewHolder(rootView);
+        } else if (viewType == TYPE_NORMAL){
+            View rootView = mInflater.inflate(R.layout.list_item_image, viewGroup, false);
+            mHolder = new ImageAdapterViewHolder(rootView);
+        } else {
+            // unknown view type, go to the hell
+        }
 
         return mHolder;
     }
 
-    protected void performClicked(ImageAdapterViewHolder holder, int position) {
-        if (null != recyclerListener) {
-            recyclerListener.onElementClick(holder, position);
+//    protected void performClicked(ImageAdapterViewHolder holder, int position) {
+//        if (null != recyclerListener) {
+//            Image image = position == 0 ? null : mImages.get(position -1);
+//            recyclerListener.onElementClick(holder, image);
+//        }
+//    }
+
+    @Override
+    public void onBindViewHolder(ImageAdapterViewHolder holder, int position) {
+        if (TYPE_NORMAL == getItemViewType(position)) {
+            holder.bindData(mImages.get(position -1));
+        } else {
+            // need not to bind for camera type or others.
         }
     }
 
     @Override
-    public void onBindViewHolder(ImageAdapterViewHolder holder, int position) {
-        holder.bindData(mDatas.get(position), null);
-    }
-
-    @Override
     public int getItemCount() {
-        return mDatas.size();
+        return showCamera ? 1 + mImages.size() : mImages.size();
     }
 
     public void setOnItemClickListener(RecyclerClickListener recyclerListener) {

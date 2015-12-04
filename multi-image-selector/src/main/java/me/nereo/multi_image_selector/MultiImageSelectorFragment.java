@@ -25,13 +25,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,10 +36,10 @@ import java.util.List;
 
 import me.nereo.multi_image_selector.adapter.FolderAdapter;
 import me.nereo.multi_image_selector.adapter.ImageGridAdapter;
+import me.nereo.multi_image_selector.adapter.RecyclerClickListener;
 import me.nereo.multi_image_selector.bean.Folder;
 import me.nereo.multi_image_selector.bean.Image;
 import me.nereo.multi_image_selector.utils.FileUtils;
-import me.nereo.multi_image_selector.utils.TimeUtils;
 
 /**
  * 图片选择Fragment
@@ -185,39 +182,39 @@ public class MultiImageSelectorFragment extends Fragment {
 
         mGridView = (RecyclerView) view.findViewById(R.id.grid);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 3);
         mGridView.setLayoutManager(layoutManager);
 
-        mGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int state) {
-
-                final Picasso picasso = Picasso.with(getActivity());
-                if(state == SCROLL_STATE_IDLE || state == SCROLL_STATE_TOUCH_SCROLL){
-                    picasso.resumeTag(getActivity());
-                }else{
-                    picasso.pauseTag(getActivity());
-                }
-
-                if(state == SCROLL_STATE_IDLE){
-                    // 停止滑动，日期指示器消失
-                    mTimeLineText.setVisibility(View.GONE);
-                }else if(state == SCROLL_STATE_FLING){
-                    mTimeLineText.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if(mTimeLineText.getVisibility() == View.VISIBLE) {
-                    int index = firstVisibleItem + 1 == view.getAdapter().getCount() ? view.getAdapter().getCount() - 1 : firstVisibleItem + 1;
-                    Image image = (Image) view.getAdapter().getItem(index);
-                    if (image != null) {
-                        mTimeLineText.setText(TimeUtils.formatPhotoDate(image.path));
-                    }
-                }
-            }
-        });
+//        mGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView absListView, int state) {
+//
+//                final Picasso picasso = Picasso.with(getActivity());
+//                if(state == SCROLL_STATE_IDLE || state == SCROLL_STATE_TOUCH_SCROLL){
+//                    picasso.resumeTag(getActivity());
+//                }else{
+//                    picasso.pauseTag(getActivity());
+//                }
+//
+//                if(state == SCROLL_STATE_IDLE){
+//                    // 停止滑动，日期指示器消失
+//                    mTimeLineText.setVisibility(View.GONE);
+//                }else if(state == SCROLL_STATE_FLING){
+//                    mTimeLineText.setVisibility(View.VISIBLE);
+//                }
+//            }
+//
+//            @Override
+//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//                if(mTimeLineText.getVisibility() == View.VISIBLE) {
+//                    int index = firstVisibleItem + 1 == view.getAdapter().getCount() ? view.getAdapter().getCount() - 1 : firstVisibleItem + 1;
+//                    Image image = (Image) view.getAdapter().getItem(index);
+//                    if (image != null) {
+//                        mTimeLineText.setText(TimeUtils.formatPhotoDate(image.path));
+//                    }
+//                }
+//            }
+//        });
 
         mGridView.setAdapter(mImageAdapter);
         mGridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -244,22 +241,23 @@ public class MultiImageSelectorFragment extends Fragment {
             }
         });
 
-        mImageAdapter.setOnItemClickListener() {
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mImageAdapter.setOnItemClickListener(new RecyclerClickListener() {
+//        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onElementClick(ImageGridAdapter.ImageAdapterViewHolder holder, Image image) {
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if(mImageAdapter.isShowCamera()){
                     // 如果显示照相机，则第一个Grid显示为照相机，处理特殊逻辑
-                    if(i == 0){
+                    if(null == image){
                         showCameraAction();
                     }else{
                         // 正常操作
-                        Image image = (Image) adapterView.getAdapter().getItem(i);
+//                        Image image = (Image) mImageAdapter.getItem(position);
                         selectImageFromGrid(image, mode);
                     }
                 }else{
                     // 正常操作
-                    Image image = (Image) adapterView.getAdapter().getItem(i);
+//                    Image image = (Image) mImageAdapter.getItem(position);
                     selectImageFromGrid(image, mode);
                 }
             }
