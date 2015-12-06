@@ -14,10 +14,9 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import me.nereo.multi_image_selector.ImagePickerConstants;
 
 public class MainActivity extends AppActivity {
-
-    private static final int REQUEST_IMAGE = 2;
 
     @Bind(R.id.result) TextView mResultText;
     @Bind(R.id.choice_mode) RadioGroup mChoiceMode;
@@ -36,7 +35,7 @@ public class MainActivity extends AppActivity {
 
         boolean showCamera = mShowCamera.getCheckedRadioButtonId() == R.id.show;
 
-        int maxNum = MultiImageSelectorActivity.DEFAULT_MAX_COUNT;
+        int maxNum = ImagePickerConstants.DEFAULT_MAX_COUNT;
         if(!TextUtils.isEmpty(mRequestNum.getText())){
             maxNum = Integer.valueOf(mRequestNum.getText().toString());
         }
@@ -45,14 +44,14 @@ public class MainActivity extends AppActivity {
         // 是否显示拍摄图片
         intent.putExtra(MultiImageSelectorActivity.EXTRA_SHOW_CAMERA, showCamera);
         // 最大可选择图片数量
-        intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_COUNT, maxNum);
+        intent.putExtra(ImagePickerConstants.EXTRA_SELECT_COUNT, maxNum);
         // 选择模式
         intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_MODE, selectedMode);
         // 默认选择
         if(mSelectPath != null && mSelectPath.size() > 0){
-            intent.putExtra(MultiImageSelectorActivity.EXTRA_DEFAULT_SELECTED_LIST, mSelectPath);
+            intent.putExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, mSelectPath);
         }
-        startActivityForResult(intent, REQUEST_IMAGE);
+        startActivityForResult(intent, ImagePickerConstants.REQUEST_IMAGE);
     }
 
     private ArrayList<String> mSelectPath;
@@ -88,9 +87,9 @@ public class MainActivity extends AppActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_IMAGE){
+        if(requestCode == ImagePickerConstants.REQUEST_IMAGE){
             if(resultCode == RESULT_OK){
-                mSelectPath = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+                mSelectPath = data.getStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT);
                 StringBuilder sb = new StringBuilder();
                 for(String p: mSelectPath){
                     sb.append(p);

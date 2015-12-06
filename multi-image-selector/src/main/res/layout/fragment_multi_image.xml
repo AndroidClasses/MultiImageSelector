@@ -70,7 +70,6 @@
             android:layout_height="match_parent" />
 
         <Button
-            android:visibility="gone"
             android:id="@+id/preview"
             tools:text="预览(1)"
             android:paddingLeft="16dp"

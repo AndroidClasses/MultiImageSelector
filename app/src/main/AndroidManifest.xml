@@ -24,6 +24,12 @@
             android:name=".MultiImageSelectorActivity" />
 
         <!--<activity android:name=".GestureImageActivity" />-->
+        <activity android:name=".ShowImageActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
     </application>
 

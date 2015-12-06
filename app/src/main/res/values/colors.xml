@@ -7,4 +7,6 @@
     <color name="brand_secondary">#ff0f3fce</color>
     <color name="brand_accent">#ffff0000</color>
 
+    <color name="photo_detail_progress_bg">#dedede</color>
+    <color name="photo_detail_progress_color">#f5aa00</color>
 </resources>

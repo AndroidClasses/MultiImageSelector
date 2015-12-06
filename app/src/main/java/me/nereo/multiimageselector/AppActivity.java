@@ -17,12 +17,14 @@ public class AppActivity extends AppCompatActivity {
     Toolbar mToolbar;
 
     @Override
-    public void onPostCreate(Bundle savedInstanceState) {
+    protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         ButterKnife.bind(this);
 
-        mToolbar.setTitle(getTitle());
-        setSupportActionBar(mToolbar);
+        if (null != mToolbar) {
+            mToolbar.setTitle(getTitle());
+            setSupportActionBar(mToolbar);
+        }
 
         ActionBar ab = getSupportActionBar();
         if (null != ab) {

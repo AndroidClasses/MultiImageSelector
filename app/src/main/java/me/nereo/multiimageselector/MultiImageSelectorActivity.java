@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import java.io.File;
 import java.util.ArrayList;
 
+import me.nereo.multi_image_selector.ImagePickerConstants;
 import me.nereo.multi_image_selector.MultiImageSelectorFragment;
 
 /**
@@ -16,25 +17,20 @@ import me.nereo.multi_image_selector.MultiImageSelectorFragment;
  * Created by Nereo on 2015/4/7.
  */
 public class MultiImageSelectorActivity extends AppActivity implements MultiImageSelectorFragment.Callback {
-
-    /** 最大图片选择次数，int类型，默认9 */
-    public static final String EXTRA_SELECT_COUNT = "max_select_count";
     /** 图片选择模式，默认多选 */
     public static final String EXTRA_SELECT_MODE = "select_count_mode";
     /** 是否显示相机，默认显示 */
     public static final String EXTRA_SHOW_CAMERA = "show_camera";
     /** 选择结果，返回为 ArrayList&lt;String&gt; 图片路径集合  */
-    public static final String EXTRA_RESULT = "select_result";
+//    public static final String EXTRA_RESULT = "select_result";
     /** 默认选择集 */
-    public static final String EXTRA_DEFAULT_SELECTED_LIST = "default_list";
+//    public static final String EXTRA_DEFAULT_SELECTED_LIST = "default_list";
 
     /** 单选 */
     public static final int MODE_SINGLE = 0;
     /** 多选 */
     public static final int MODE_MULTI = 1;
 
-    /** default max selection count **/
-    public static final int DEFAULT_MAX_COUNT = 9;
 
 //    @Bind(R.id.commit) Button mSubmitButton;
 //    @OnClick(R.id.btn_back)
@@ -47,7 +43,7 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
         if(resultList != null && resultList.size() > 0){
             // 返回已选择的图片数据
             Intent data = new Intent();
-            data.putStringArrayListExtra(EXTRA_RESULT, resultList);
+            data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, resultList);
             setResult(RESULT_OK, data);
             finish();
         }
@@ -67,18 +63,19 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
         super.onPostCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        mDefaultCount = intent.getIntExtra(EXTRA_SELECT_COUNT, DEFAULT_MAX_COUNT);
+        mDefaultCount = intent.getIntExtra(ImagePickerConstants.EXTRA_SELECT_COUNT,
+                ImagePickerConstants.DEFAULT_MAX_COUNT);
         int mode = intent.getIntExtra(EXTRA_SELECT_MODE, MODE_MULTI);
         boolean isShow = intent.getBooleanExtra(EXTRA_SHOW_CAMERA, true);
-        if (mode == MODE_MULTI && intent.hasExtra(EXTRA_DEFAULT_SELECTED_LIST)) {
-            resultList = intent.getStringArrayListExtra(EXTRA_DEFAULT_SELECTED_LIST);
+        if (mode == MODE_MULTI && intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
+            resultList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
         }
 
         Bundle bundle = new Bundle();
-        bundle.putInt(MultiImageSelectorFragment.EXTRA_SELECT_COUNT, mDefaultCount);
-        bundle.putInt(MultiImageSelectorFragment.EXTRA_SELECT_MODE, mode);
-        bundle.putBoolean(MultiImageSelectorFragment.EXTRA_SHOW_CAMERA, isShow);
-        bundle.putStringArrayList(MultiImageSelectorFragment.EXTRA_DEFAULT_SELECTED_LIST, resultList);
+        bundle.putInt(ImagePickerConstants.EXTRA_SELECT_COUNT, mDefaultCount);
+        bundle.putInt(ImagePickerConstants.EXTRA_SELECT_MODE, mode);
+        bundle.putBoolean(ImagePickerConstants.EXTRA_SHOW_CAMERA, isShow);
+        bundle.putStringArrayList(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, resultList);
 
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.image_grid, Fragment.instantiate(this, MultiImageSelectorFragment.class.getName(), bundle))
@@ -107,7 +104,7 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
     public void onSingleImageSelected(String path) {
         Intent data = new Intent();
         resultList.add(path);
-        data.putStringArrayListExtra(EXTRA_RESULT, resultList);
+        data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, resultList);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -133,7 +130,7 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
         if(imageFile != null) {
             Intent data = new Intent();
             resultList.add(imageFile.getAbsolutePath());
-            data.putStringArrayListExtra(EXTRA_RESULT, resultList);
+            data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, resultList);
             setResult(RESULT_OK, data);
             finish();
         }
@@ -171,5 +168,16 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == ImagePickerConstants.REQUEST_IMAGE){ // todo: apply Bus system and redesign these.
+            if(resultCode == RESULT_OK){
+                // forward the result from preview activity
+                onSelectionSubmit();
+            }
+        }
     }
 }

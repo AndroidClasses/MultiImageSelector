@@ -154,16 +154,16 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 //    }
 //
 //    @Override
-//    public Image getItem(int i) {
-//        if(showCamera){
-//            if(i == 0){
-//                return null;
-//            }
-//            return mImages.get(i-1);
-//        }else{
-//            return mImages.get(i);
-//        }
-//    }
+    public Image getItem(int i) {
+        if(showCamera){
+            if(i == 0){
+                return null;
+            }
+            return mImages.get(i-1);
+        }else{
+            return mImages.get(i);
+        }
+    }
 //
 //    @Override
 //    public long getItemId(int i) {

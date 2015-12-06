@@ -2,6 +2,7 @@
     <string name="app_name">multi-image-selector</string>
     <string name="folder_all">All Images</string>
     <string name="preview">Preview</string>
+    <string name="preview_with_count">Preview(%1$s)</string>
     <string name="msg_no_camera">No system camera found</string>
     <string name="msg_amount_limit">Select images amount is limit</string>
 
@@ -10,5 +11,6 @@
 
     <string name="activity_picker_title">Photo</string>
     <string name="picker_menu_empty">OK</string>
+    <string name="preview_action_check">Select</string>
     <string name="picker_menu">OK(%1$s/%2$s)</string>
 </resources>

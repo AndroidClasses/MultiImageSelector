@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <it.sephiroth.android.library.imagezoom.ImageViewTouch
+        android:id="@+id/image"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="@dimen/photo_detail_progress_w"
+        android:layout_height="7dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/photo_detail_progress_margin_t"
+        android:progressDrawable="@drawable/image_detail_progressbar_style"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/ll_process"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/photo_detail_txt_progress_margin_t"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/image_loading"
+            android:textSize="@dimen/photo_detail_but_text_size" />
+
+        <TextView
+            android:id="@+id/tv_process"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="@dimen/photo_detail_but_text_size"
+            android:visibility="visible" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textSize="@dimen/photo_detail_but_text_size"
+            android:visibility="visible" />
+    </LinearLayout>
+
+</RelativeLayout>

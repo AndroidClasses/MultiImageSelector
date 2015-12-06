@@ -2,4 +2,11 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- 大图页 -->
+    <dimen name="photo_detail_progress_w">240dp</dimen>
+    <dimen name="photo_detail_progress_margin_t">320dp</dimen>
+    <dimen name="photo_detail_txt_progress_margin_t">300dp</dimen>
+    <dimen name="photo_detail_but_text_size">12sp</dimen>
+
 </resources>
