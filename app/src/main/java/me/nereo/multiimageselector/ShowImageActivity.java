@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.Inflater;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener;
@@ -61,7 +60,7 @@ public class ShowImageActivity extends AppActivity {
 
 	private ArrayList<String> mSelectedUrl = new ArrayList<String>();
 //	private ArrayList<String> listId = new ArrayList<String>();
-	private static Map<String, Bitmap> mapBitmap = new HashMap<String, Bitmap>();
+	private static Map<String, Bitmap> mapBitmap;
 
 	private int mDefaultCount;
 
@@ -80,16 +79,16 @@ public class ShowImageActivity extends AppActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_image);
 
-		if (null == savedInstanceState) {
-			mapBitmap.clear();
-		}
-
 		init();
 	}
 
 
 	private void init() {
 		initImageLoader(this);
+
+		if (null == mapBitmap) {
+			mapBitmap = new HashMap<String, Bitmap>();
+		}
 
 		screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 		screenHeight = getWindowManager().getDefaultDisplay().getHeight();
@@ -199,13 +198,15 @@ public class ShowImageActivity extends AppActivity {
 			mBitmap = null;
 		}
 
-		for (Entry<String, Bitmap> entry : mapBitmap.entrySet()) {
-			if (entry.getValue() != null && !entry.getValue().isRecycled()) {
-				entry.getValue().recycle();
+		if (null != mapBitmap) {
+			for (Entry<String, Bitmap> entry : mapBitmap.entrySet()) {
+				if (entry.getValue() != null && !entry.getValue().isRecycled()) {
+					entry.getValue().recycle();
+				}
 			}
+			mapBitmap.clear();
+			mapBitmap = null;
 		}
-		mapBitmap.clear();
-		mapBitmap = null;
 	}
 
 	private OnImageViewTouchSingleTapListener mSingleTapListener = new OnImageViewTouchSingleTapListener() {
