@@ -58,12 +58,6 @@ public class MultiImageSelectorFragment extends Fragment {
     // 请求加载系统照相机
     private static final int REQUEST_CAMERA = 100;
 
-
-    // 结果数据
-    private ArrayList<String> resultList = new ArrayList<>();
-    // 文件夹数据
-    private ArrayList<Folder> mResultFolder = new ArrayList<>();
-
     // 图片Grid
     private RecyclerView mGridView;
     private Callback mCallback;
@@ -93,9 +87,12 @@ public class MultiImageSelectorFragment extends Fragment {
 
     private GridLayoutManager mLayoutManager;
 
+    private ImagePickerSelection mImageSelection;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         try {
             mCallback = (Callback) activity;
         }catch (ClassCastException e){
@@ -112,6 +109,8 @@ public class MultiImageSelectorFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mImageSelection = ImagePickerSelection.getInstance();
+
         // 选择图片数量
         mDesireImageCount = getArguments().getInt(ImagePickerConstants.EXTRA_SELECT_COUNT);
 
@@ -121,9 +120,7 @@ public class MultiImageSelectorFragment extends Fragment {
         // 默认选择
         if(mode == ImagePickerConstants.MODE_MULTI) {
             ArrayList<String> tmp = getArguments().getStringArrayList(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
-            if(tmp != null && tmp.size()>0) {
-                resultList = tmp;
-            }
+            mImageSelection.setSourceList(tmp);
         }
 
         // 是否显示照相机
@@ -294,6 +291,7 @@ public class MultiImageSelectorFragment extends Fragment {
                                 mImageAdapter.setData(folder.images);
                                 mCategoryText.setText(folder.name);
                                 // 设定默认选择
+                                ArrayList<String> resultList = mImageSelection.getList();
                                 if (resultList != null && resultList.size() > 0) {
                                     mImageAdapter.setDefaultSelected(resultList);
                                 }
@@ -403,20 +401,19 @@ public class MultiImageSelectorFragment extends Fragment {
         if(image != null) {
             // 多选模式
             if(mode == ImagePickerConstants.MODE_MULTI) {
-                if (resultList.contains(image.path)) {
-                    resultList.remove(image.path);
+                int result = mImageSelection.toggleSelection(image.path, mDesireImageCount);
+                if (result < 0) {
                     refreshWithResultUi();
                     if (mCallback != null) {
                         mCallback.onImageUnselected(image.path);
                     }
                 } else {
                     // 判断选择数量问题
-                    if(mDesireImageCount == resultList.size()){
+                    if(result == 0){
                         Toast.makeText(getActivity(), R.string.msg_amount_limit, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    resultList.add(image.path);
                     refreshWithResultUi();
                     if (mCallback != null) {
                         mCallback.onImageSelected(image.path);
@@ -460,48 +457,35 @@ public class MultiImageSelectorFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if (data != null) {
-                List<Image> images = new ArrayList<>();
+                List<Image> allLoadedImages = new ArrayList<>();
                 int count = data.getCount();
                 if (count > 0) {
                     data.moveToFirst();
-                    do{
+                    do {
                         String path = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[0]));
                         String name = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[1]));
                         long dateTime = data.getLong(data.getColumnIndexOrThrow(IMAGE_PROJECTION[2]));
                         Image image = new Image(path, name, dateTime);
-                        images.add(image);
-                        if( !hasFolderGened ) {
-                            // 获取文件夹名称
-                            File imageFile = new File(path);
-                            File folderFile = imageFile.getParentFile();
-                            Folder folder = new Folder();
-                            folder.name = folderFile.getName();
-                            folder.path = folderFile.getAbsolutePath();
-                            folder.cover = image;
-                            if (!mResultFolder.contains(folder)) {
-                                List<Image> imageList = new ArrayList<>();
-                                imageList.add(image);
-                                folder.images = imageList;
-                                mResultFolder.add(folder);
-                            } else {
-                                // 更新
-                                Folder f = mResultFolder.get(mResultFolder.indexOf(folder));
-                                f.images.add(image);
-                            }
+                        allLoadedImages.add(image);
+
+                        if(hasFolderGened ) {
+                            // do nothing as we generated folder before
+                        } else {
+                            mImageSelection.parseFolder(image, path);
                         }
 
-                    }while(data.moveToNext());
+                    } while (data.moveToNext());
 
-                    mImageAdapter.setData(images);
+                    mImageAdapter.setData(allLoadedImages);
 
                     // 设定默认选择
-                    if(resultList != null && resultList.size()>0){
+                    ArrayList<String> resultList = mImageSelection.getList();
+                    if(resultList != null && !resultList.isEmpty()){
                         mImageAdapter.setDefaultSelected(resultList);
                     }
 
-                    mFolderAdapter.setData(mResultFolder);
+                    mFolderAdapter.setData(mImageSelection.getFolderList());
                     hasFolderGened = true;
-
                 }
             }
         }
@@ -522,35 +506,25 @@ public class MultiImageSelectorFragment extends Fragment {
         void onCameraShot(File imageFile);
     }
 
-    private int getSelectedCount() {
-        int count = 0;
-        if (null == resultList) {
-            count = 0;
-        } else {
-            count = resultList.size();
-        }
-        return count;
-    }
-
     private void refreshWithResultUi() {
-        int selectedCount = getSelectedCount();
+        int selectedCount = mImageSelection.getSelectedCount();
         if(selectedCount <= 0) {
             mPreviewBtn.setEnabled(false);
             mPreviewBtn.setText(R.string.preview);
         } else {
             mPreviewBtn.setEnabled(true);
-            mPreviewBtn.setText(getResources().getString(R.string.preview_with_count, resultList.size()));
+            mPreviewBtn.setText(getResources().getString(R.string.preview_with_count, selectedCount));
         }
     }
 
     // todo: listen for selection change from out side screen
     private void onSelectionPreview() {
-        int selectedCount = getSelectedCount();
+        int selectedCount = mImageSelection.getSelectedCount();
         if (selectedCount <= 0) {
             // do nothing, should not be here as design
             Log.e(TAG, "onSelectionPreview, trigger with invalid selection count " + selectedCount);
         } else {
-            PickerUtils.startPreviewActivityForResult(getActivity(), resultList, mDesireImageCount, null, 0);
+            PickerUtils.startPreviewActivityForResult(getActivity(), mImageSelection.getList(), mDesireImageCount, null, 0);
         }
     }
 }
