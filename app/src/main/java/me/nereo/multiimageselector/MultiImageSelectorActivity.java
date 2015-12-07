@@ -113,16 +113,16 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
     public void onImageSelected(String path) {
         if(null != resultList && !resultList.contains(path)) {
             resultList.add(path);
-            refreshWithResultUi();
         }
+        refreshWithResultUi();
     }
 
     @Override
     public void onImageUnselected(String path) {
         if (null != resultList && resultList.contains(path)) {
             resultList.remove(path);
-            refreshWithResultUi();
         }
+        refreshWithResultUi();
     }
 
     @Override
