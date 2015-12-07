@@ -538,9 +538,7 @@ public class MultiImageSelectorFragment extends Fragment {
 
     @Subscribe
     public void onEvent(SelectionChangeEvent event) {
-//    public void onEventMainThread(Object event) {
-//        if (event instanceof SelectionChangeEvent) {
-            mImageAdapter.notifyDataSetChanged();
-//        }
+        mImageAdapter.notifyDataSetChanged();
+        refreshWithResultUi();
     }
 }
