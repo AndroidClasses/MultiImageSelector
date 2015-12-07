@@ -231,7 +231,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
                     if (null != recyclerListener) {
 //                        Image image = getDataItem(getAdapterPosition());
 //                        performItemSelected(mHolder, image);
-                        performItemPreviewed(getAdapterPosition());
+                        performItemPreviewed(mHolder, getAdapterPosition());
                     }
                 }
             });
@@ -309,9 +309,16 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
         }
     }
 
-    private void performItemPreviewed(int position) {
-        int index = isShowCamera() ? position - 1 : position;
-        PickerUtils.startPreview(mContext, mSelectedImages, mMaxSelectedCount, mImages, index);
+    private void performItemPreviewed(ImageAdapterViewHolder holder, int position) {
+        if (isShowCamera()) {
+            if (position == 0) { // start camera outside
+                performItemSelected(holder, null);
+            } else {
+                PickerUtils.startPreview(mContext, mSelectedImages, mMaxSelectedCount, mImages, position - 1);
+            }
+        } else {
+            PickerUtils.startPreview(mContext, mSelectedImages, mMaxSelectedCount, mImages, position);
+        }
     }
 
     private Image getDataItem(int position) {
