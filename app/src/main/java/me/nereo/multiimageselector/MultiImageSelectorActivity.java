@@ -17,28 +17,6 @@ import me.nereo.multi_image_selector.MultiImageSelectorFragment;
  * Created by Nereo on 2015/4/7.
  */
 public class MultiImageSelectorActivity extends AppActivity implements MultiImageSelectorFragment.Callback {
-    /** 图片选择模式，默认多选 */
-    public static final String EXTRA_SELECT_MODE = "select_count_mode";
-    /** 是否显示相机，默认显示 */
-    public static final String EXTRA_SHOW_CAMERA = "show_camera";
-    /** 选择结果，返回为 ArrayList&lt;String&gt; 图片路径集合  */
-//    public static final String EXTRA_RESULT = "select_result";
-    /** 默认选择集 */
-//    public static final String EXTRA_DEFAULT_SELECTED_LIST = "default_list";
-
-    /** 单选 */
-    public static final int MODE_SINGLE = 0;
-    /** 多选 */
-    public static final int MODE_MULTI = 1;
-
-
-//    @Bind(R.id.commit) Button mSubmitButton;
-//    @OnClick(R.id.btn_back)
-//    void onBackClicked() {
-//        setResult(RESULT_CANCELED);
-//        finish();
-//    }
-//    @OnClick(R.id.commit)
     void onSelectionSubmit() {
         if(resultList != null && resultList.size() > 0){
             // 返回已选择的图片数据
@@ -65,9 +43,9 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
         Intent intent = getIntent();
         mDefaultCount = intent.getIntExtra(ImagePickerConstants.EXTRA_SELECT_COUNT,
                 ImagePickerConstants.DEFAULT_MAX_COUNT);
-        int mode = intent.getIntExtra(EXTRA_SELECT_MODE, MODE_MULTI);
-        boolean isShow = intent.getBooleanExtra(EXTRA_SHOW_CAMERA, true);
-        if (mode == MODE_MULTI && intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
+        int mode = intent.getIntExtra(ImagePickerConstants.EXTRA_SELECT_MODE, ImagePickerConstants.MODE_MULTI);
+        boolean isShow = intent.getBooleanExtra(ImagePickerConstants.EXTRA_SHOW_CAMERA, true);
+        if (mode == ImagePickerConstants.MODE_MULTI && intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
             resultList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
         }
 
@@ -82,14 +60,6 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
                 .commit();
 
         refreshWithResultUi();
-    }
-
-    private void refreshWithResultUi() {
-        // 完成按钮
-//        boolean haveResult = resultList != null && !resultList.isEmpty();
-//        mSubmitButton.setText(getSelectedResult(haveResult));
-//        mSubmitButton.setEnabled(haveResult);
-        invalidateOptionsMenu();
     }
 
     private String getSelectedResult(boolean haveResult) {
@@ -179,5 +149,9 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
                 onSelectionSubmit();
             }
         }
+    }
+
+    private void refreshWithResultUi() {
+        invalidateOptionsMenu();
     }
 }

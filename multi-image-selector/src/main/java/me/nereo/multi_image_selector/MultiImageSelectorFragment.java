@@ -199,8 +199,6 @@ public class MultiImageSelectorFragment extends Fragment {
             public void onScrolled(RecyclerView view, int dx, int dy) {
                 if(mTimeLineText.getVisibility() == View.VISIBLE) {
                     int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
-//                    int itemCount = view.getAdapter().getItemCount();
-//                    int index = firstVisibleItem + 1 == itemCount ? itemCount - 1 : firstVisibleItem + 1;
                     int index = firstVisibleItem;
                     Image image = mImageAdapter.getItem(index);
                     if (image != null) {
@@ -236,22 +234,18 @@ public class MultiImageSelectorFragment extends Fragment {
         });
 
         mImageAdapter.setOnItemClickListener(new RecyclerClickListener() {
-//        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onElementClick(ImageGridAdapter.ImageAdapterViewHolder holder, Image image) {
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if(mImageAdapter.isShowCamera()){
                     // 如果显示照相机，则第一个Grid显示为照相机，处理特殊逻辑
                     if(null == image){
                         showCameraAction();
                     }else{
                         // 正常操作
-//                        Image image = (Image) mImageAdapter.getItem(position);
                         selectImageFromGrid(image, mode);
                     }
                 }else{
                     // 正常操作
-//                    Image image = (Image) mImageAdapter.getItem(position);
                     selectImageFromGrid(image, mode);
                 }
             }
@@ -320,7 +314,6 @@ public class MultiImageSelectorFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // 首次加载所有图片
-        //new LoadImageTask().execute();
         getActivity().getSupportLoaderManager().initLoader(LOADER_ALL, null, mLoaderCallback);
     }
 
@@ -558,17 +551,6 @@ public class MultiImageSelectorFragment extends Fragment {
             Log.e(TAG, "onSelectionPreview, trigger with invalid selection count " + selectedCount);
         } else {
             PickerUtils.startPreviewActivityForResult(getActivity(), resultList, mDesireImageCount, null, 0);
-//            Activity activity = getActivity();
-//            Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-//            intent.putExtra(ImagePickerConstants.EXTRA_SELECT_COUNT, mDesireImageCount);
-//            intent.putExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, resultList);
-//            intent.setPackage(activity.getPackageName());
-//            try {
-//                activity.startActivityForResult(intent, ImagePickerConstants.REQUEST_IMAGE);
-////                activity.startActivity(intent);
-//            } catch (ActivityNotFoundException ex) {
-//                ex.printStackTrace();
-//            }
         }
     }
 }

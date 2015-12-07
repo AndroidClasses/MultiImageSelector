@@ -55,11 +55,7 @@ public class ShowImageActivity extends AppActivity {
 
 	private Bitmap mBitmap;
 
-//	private String mImageUrl;
-//	private String mMsgId;
-
 	private ArrayList<String> mSelectedUrl = new ArrayList<String>();
-//	private ArrayList<String> listId = new ArrayList<String>();
 	private static Map<String, Bitmap> mapBitmap;
 
 	private int mDefaultCount;
@@ -130,7 +126,6 @@ public class ShowImageActivity extends AppActivity {
 	protected void onPostCreate(Bundle saveInstanceState) {
 		super.onPostCreate(saveInstanceState);
 
-//		int position = listId.indexOf(mMsgId);
 		pager = (HackyViewPager) findViewById(R.id.pager);
 
 		mImagePagerAdapter = new ImagePagerAdapter(this, mAllImageUrl, mSingleTapListener);
@@ -228,7 +223,6 @@ public class ShowImageActivity extends AppActivity {
 			this.mSingleTapListener = singleTapListener;
 
 			inflater = LayoutInflater.from(context);
-//			inflater = getLayoutInflater();
 		}
 
 		@Override
@@ -273,7 +267,6 @@ public class ShowImageActivity extends AppActivity {
 				}
 			};
 			final String imageUri = Uri.fromFile(new File(mAllImages.get(position))).toString();
-//			imageViewTouchItem.setBackgroundResource(R.drawable.pic_loading);
 
 			showImage(imageUri, imageViewTouchItem, handler,
 					spinner, ll_process, tv_process);
@@ -347,6 +340,7 @@ public class ShowImageActivity extends AppActivity {
 						message = "Unknown error";
 						break;
 				}
+
 				imageViewTouchItem.setBackgroundResource(R.drawable.pic_failed);
 				spinner.setVisibility(View.GONE);
 				ll_process.setVisibility(View.GONE);
@@ -371,56 +365,6 @@ public class ShowImageActivity extends AppActivity {
 			public void onLoadingCancelled(String imageUri, View view) {
 				// Empty implementation
 			}
-
-//            @Override
-//            public void onLoadingStarted(String imageUri, View view) {
-//                Message msg = new Message();
-//                msg.what = 0;
-//                handler.sendMessage(msg);
-//                ImageViewTouch image = (ImageViewTouch) view;
-//                image.setDoubleTapEnabled(false);
-//            }
-
-//            @Override
-//            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-//                String message = null;
-//                switch (failReason.getType()) {
-//                    case IO_ERROR:
-//                        message = "Input/Output error";
-//                        break;
-//                    case DECODING_ERROR:
-//                        message = "Image can't be decoded";
-//                        break;
-//                    case NETWORK_DENIED:
-//                        message = "Downloads are denied";
-//                        break;
-//                    case OUT_OF_MEMORY:
-//                        message = "Out Of Memory error";
-//                        break;
-//                    case UNKNOWN:
-//                        message = "Unknown error";
-//                        break;
-//                }
-//                imageViewTouchItem.setBackgroundResource(R.drawable.pic_failed);
-//                spinner.setVisibility(View.GONE);
-//                ll_process.setVisibility(View.GONE);
-//            }
-
-//            @Override
-//            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-//                imageViewTouchItem.setBackgroundResource(android.R.color.black);
-//                spinner.setVisibility(View.GONE);
-//                ll_process.setVisibility(View.GONE);
-//                if (loadedImage != null && !loadedImage.isRecycled()) {
-//                    if (mapBitmap != null && !mapBitmap.containsKey(imageUri)) {
-//                        mapBitmap.put(imageUri, loadedImage);
-//                    }
-//
-//                    ImageViewTouch image = (ImageViewTouch) view;
-//                    image.setDoubleTapEnabled(true);
-//                }
-//            }
-
 		}, new ImageLoadingProgressListener() {
 			@Override
 			public void onProgressUpdate(String imageUri, View view, int current, int total) {
@@ -438,23 +382,6 @@ public class ShowImageActivity extends AppActivity {
 					}
 				}
 			}
-//            @Override
-//            public void onProgressUpdate(String imageUri, View view, int current, int total) {
-//                // 监听图片的加载进度
-//                if (total != 0) {
-//                    int progress = (int) (((double) current / (double) total) * 100);
-//                    if (current == 0)
-//                        progress = 1;
-//                    spinner.setProgress(progress);
-//                    tv_process.setText(String.valueOf(progress));
-//                } else {
-//                    if (spinner != null && tv_process != null) {
-//                        spinner.setVisibility(View.GONE);
-//                        tv_process.setVisibility(View.GONE);
-//                    }
-//                }
-//            }
-
 		});
 	}
 	public static void initImageLoader(Context context) {
@@ -521,6 +448,7 @@ public class ShowImageActivity extends AppActivity {
 			finish();
 		}
 	}
+
 	private void refreshWithResultUi() {
 		invalidateOptionsMenu();
 		setTitle((1 + pager.getCurrentItem()) + "/" + mAllImageUrl.size());
