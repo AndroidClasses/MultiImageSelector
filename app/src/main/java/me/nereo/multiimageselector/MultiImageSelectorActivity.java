@@ -154,6 +154,7 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
                 onSelectionSubmit();
             } else {
                 EventBus.getDefault().post(new SelectionChangeEvent());
+                refreshWithResultUi();
             }
         }
     }
