@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.Inflater;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener;
@@ -60,7 +61,7 @@ public class ShowImageActivity extends AppActivity {
 
 	private ArrayList<String> mSelectedUrl = new ArrayList<String>();
 //	private ArrayList<String> listId = new ArrayList<String>();
-	private Map<String, Bitmap> mapBitmap = new HashMap<String, Bitmap>();
+	private static Map<String, Bitmap> mapBitmap = new HashMap<String, Bitmap>();
 
 	private int mDefaultCount;
 
@@ -78,6 +79,10 @@ public class ShowImageActivity extends AppActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_image);
+
+		if (null == savedInstanceState) {
+			mapBitmap.clear();
+		}
 
 		init();
 	}
@@ -129,7 +134,7 @@ public class ShowImageActivity extends AppActivity {
 //		int position = listId.indexOf(mMsgId);
 		pager = (HackyViewPager) findViewById(R.id.pager);
 
-		mImagePagerAdapter = new ImagePagerAdapter(mAllImageUrl);
+		mImagePagerAdapter = new ImagePagerAdapter(this, mAllImageUrl, mSingleTapListener);
 		pager.setAdapter(mImagePagerAdapter);
 		pager.setCurrentItem(mDefaultPreviewIndex);
 
@@ -203,20 +208,26 @@ public class ShowImageActivity extends AppActivity {
 		mapBitmap = null;
 	}
 
-	public class ImagePagerAdapter extends PagerAdapter {
-		private ArrayList<String> mAllImages;
-		private LayoutInflater inflater;
-
-		private it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener singleTapListener = new OnImageViewTouchSingleTapListener() {
-			@Override
-			public void onSingleTapConfirmed() {
+	private OnImageViewTouchSingleTapListener mSingleTapListener = new OnImageViewTouchSingleTapListener() {
+		@Override
+		public void onSingleTapConfirmed() {
+			if (null != mAllImageUrl && mAllImageUrl.size() == 1) {
 				finish();
 			}
-		};
+		}
+	};
 
-		ImagePagerAdapter(ArrayList<String> allImages) {
+	public static class ImagePagerAdapter extends PagerAdapter {
+		private ArrayList<String> mAllImages;
+		private LayoutInflater inflater;
+		private OnImageViewTouchSingleTapListener mSingleTapListener;
+
+		ImagePagerAdapter(Context context, ArrayList<String> allImages, OnImageViewTouchSingleTapListener singleTapListener) {
 			this.mAllImages = allImages;
-			inflater = getLayoutInflater();
+			this.mSingleTapListener = singleTapListener;
+
+			inflater = LayoutInflater.from(context);
+//			inflater = getLayoutInflater();
 		}
 
 		@Override
@@ -241,7 +252,10 @@ public class ShowImageActivity extends AppActivity {
 			final LinearLayout ll_process = (LinearLayout) imageLayout.findViewById(R.id.ll_process);
 			final TextView tv_process = (TextView) imageLayout.findViewById(R.id.tv_process);
 
-			imageViewTouchItem.setSingleTapListener(singleTapListener);
+			if (null != mSingleTapListener) {
+				imageViewTouchItem.setSingleTapListener(mSingleTapListener);
+			}
+
 			final Handler handler = new Handler() {
 				@Override
 				public void handleMessage(Message msg) {
@@ -260,7 +274,7 @@ public class ShowImageActivity extends AppActivity {
 			final String imageUri = Uri.fromFile(new File(mAllImages.get(position))).toString();
 //			imageViewTouchItem.setBackgroundResource(R.drawable.pic_loading);
 
-			showImage(imageUri, imageViewTouchItem, mapBitmap, handler,
+			showImage(imageUri, imageViewTouchItem, handler,
 					spinner, ll_process, tv_process);
 
 			((ViewPager) view).addView(imageLayout);
@@ -287,7 +301,7 @@ public class ShowImageActivity extends AppActivity {
 	}
 
 	public static void showImage(final String imageUri, final ImageViewTouch imageViewTouchItem,
-								 final Map<String, Bitmap> mapBitmap, final Handler handler,
+								 final Handler handler,
 								 final ProgressBar spinner, final LinearLayout ll_process,
 								 final TextView tv_process) {
 		ImageLoader imageLoader = ImageLoader.getInstance();
