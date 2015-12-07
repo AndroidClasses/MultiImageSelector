@@ -142,7 +142,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
     @Override
     public int getItemViewType(int position) {
-        if(showCamera){
+        if(isShowCamera()){
             return position == 0 ? TYPE_CAMERA : TYPE_NORMAL;
         }
         return TYPE_NORMAL;
@@ -150,12 +150,12 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
 //    @Override
 //    public int getCount() {
-//        return showCamera ? mImages.size()+1 : mImages.size();
+//        return isShowCamera() ? mImages.size()+1 : mImages.size();
 //    }
 //
 //    @Override
     public Image getItem(int i) {
-        if(showCamera){
+        if(isShowCamera()){
             if(i == 0){
                 return null;
             }
@@ -289,7 +289,11 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
     private Image getDataItem(int position) {
         if (TYPE_NORMAL == getItemViewType(position)) {
-            return mImages.get(position -1);
+            if (isShowCamera()) {
+                return mImages.get(position -1);
+            } else {
+                return mImages.get(position);
+            }
         } else {
             // need not to bind for camera type or others.
             return null;
@@ -302,7 +306,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
     @Override
     public int getItemCount() {
-        return showCamera ? 1 + mImages.size() : mImages.size();
+        return isShowCamera() ? 1 + mImages.size() : mImages.size();
     }
 
     private RecyclerClickListener recyclerListener;
