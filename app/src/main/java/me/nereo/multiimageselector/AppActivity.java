@@ -21,10 +21,7 @@ public class AppActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         ButterKnife.bind(this);
 
-        if (null != mToolbar) {
-            mToolbar.setTitle(getTitle());
-            setSupportActionBar(mToolbar);
-        }
+        setTitle(getTitle());
 
         ActionBar ab = getSupportActionBar();
         if (null != ab) {
@@ -38,6 +35,16 @@ public class AppActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle(title);
+
+        if (null != mToolbar) {
+            mToolbar.setTitle(getTitle());
+            setSupportActionBar(mToolbar);
+        }
     }
 
     protected boolean isHomeAsUpEnabled() {

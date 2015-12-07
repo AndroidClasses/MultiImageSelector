@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -50,13 +51,14 @@ public class ShowImageActivity extends AppActivity {
 	public static final String KEY_PIC = "show_pic";
 
 	private HackyViewPager pager;
+	private CheckBox mPageCheckMask;
 
 	private Bitmap mBitmap;
 
 //	private String mImageUrl;
 //	private String mMsgId;
 
-	private ArrayList<String> listUrl = new ArrayList<String>();
+	private ArrayList<String> mSelectedUrl = new ArrayList<String>();
 //	private ArrayList<String> listId = new ArrayList<String>();
 	private Map<String, Bitmap> mapBitmap = new HashMap<String, Bitmap>();
 
@@ -69,45 +71,77 @@ public class ShowImageActivity extends AppActivity {
 	public int statusHeight;
 	public int newScreenHeight;
 
+	private ArrayList<String> mAllImageUrl = new ArrayList<String>();
+	private int mDefaultPreviewIndex;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_image);
+
+		init();
 	}
 
-	@Override
-	protected void onPostCreate(Bundle saveInstanceState) {
-		super.onPostCreate(saveInstanceState);
 
+	private void init() {
 		initImageLoader(this);
+
+		screenWidth = getWindowManager().getDefaultDisplay().getWidth();
+		screenHeight = getWindowManager().getDefaultDisplay().getHeight();
+		statusHeight = getStatusBarHeight(ShowImageActivity.this);
+		newScreenHeight = screenHeight - statusHeight;
+
 		Intent intent = getIntent();
 		mDefaultCount = intent.getIntExtra(ImagePickerConstants.EXTRA_SELECT_COUNT,
 				ImagePickerConstants.DEFAULT_MAX_COUNT);
 
+		mDefaultPreviewIndex = intent.getIntExtra(ImagePickerConstants.EXTRA_PREVIEW_INDEX, ImagePickerConstants.DEFAULT_PREVIEW_INDEX);
+
 		if (intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
 			ArrayList<String> resultList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
 			if (null != resultList) {
-				listUrl.addAll(resultList);
+				mSelectedUrl.addAll(resultList);
 			}
 		} else {
 			Bundle bd = intent.getExtras();
 			if (bd != null) {
 				String imageUrl = bd.getString(KEY_PIC);
 				if (TextUtils.isDigitsOnly(imageUrl)) {
-					listUrl.add(imageUrl);
+					mSelectedUrl.add(imageUrl);
 				}
 			}
 		}
 
+		if (intent.hasExtra(ImagePickerConstants.EXTRA_All_SOURCE_LIST)) {
+			ArrayList<String> allList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_All_SOURCE_LIST);
+			if (null == allList || allList.isEmpty()) {
+				mAllImageUrl.addAll(mSelectedUrl);
+			} else {
+				mAllImageUrl = allList;
+			}
+		}
+	}
+
+	@Override
+	protected void onPostCreate(Bundle saveInstanceState) {
+		super.onPostCreate(saveInstanceState);
+
 //		int position = listId.indexOf(mMsgId);
 		pager = (HackyViewPager) findViewById(R.id.pager);
-		mImagePagerAdapter = new ImagePagerAdapter(listUrl, this);
+
+		mImagePagerAdapter = new ImagePagerAdapter(mAllImageUrl);
 		pager.setAdapter(mImagePagerAdapter);
-		pager.setCurrentItem(0);
+		pager.setCurrentItem(mDefaultPreviewIndex);
+
+		refreshWithResultUi();
+
 		// 设置滑动监听器
-		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+		pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageSelected(int arg0) {
+				String url = mAllImageUrl.get(pager.getCurrentItem());
+				mPageCheckMask.setChecked(mSelectedUrl.contains(url));
+				refreshWithResultUi();
 			}
 
 			@Override
@@ -119,10 +153,21 @@ public class ShowImageActivity extends AppActivity {
 			}
 		});
 
-		screenWidth = getWindowManager().getDefaultDisplay().getWidth();
-		screenHeight = getWindowManager().getDefaultDisplay().getHeight();
-		statusHeight = getStatusBarHeight(ShowImageActivity.this);
-		newScreenHeight = screenHeight - statusHeight;
+		mPageCheckMask = (CheckBox)findViewById(R.id.pager_check_mask);
+		mPageCheckMask.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				boolean isChecked = mPageCheckMask.isChecked();
+				int currentItem = pager.getCurrentItem();
+				String currentUrl = mAllImageUrl.get(currentItem);
+				if (isChecked) {
+					mSelectedUrl.add(currentUrl);
+				} else {
+					mSelectedUrl.remove(currentUrl);
+				}
+				refreshWithResultUi();
+			}
+		});
 	}
 
 	// 获取状态栏的高度
@@ -159,10 +204,8 @@ public class ShowImageActivity extends AppActivity {
 	}
 
 	public class ImagePagerAdapter extends PagerAdapter {
-
-		private ArrayList<String> images;
+		private ArrayList<String> mAllImages;
 		private LayoutInflater inflater;
-		private Context mContext;
 
 		private it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener singleTapListener = new OnImageViewTouchSingleTapListener() {
 			@Override
@@ -171,9 +214,8 @@ public class ShowImageActivity extends AppActivity {
 			}
 		};
 
-		ImagePagerAdapter(ArrayList<String> images, Context context) {
-			this.images = images;
-			this.mContext = context;
+		ImagePagerAdapter(ArrayList<String> allImages) {
+			this.mAllImages = allImages;
 			inflater = getLayoutInflater();
 		}
 
@@ -188,7 +230,7 @@ public class ShowImageActivity extends AppActivity {
 
 		@Override
 		public int getCount() {
-			return images.size();
+			return mAllImages.size();
 		}
 
 		@Override
@@ -215,7 +257,7 @@ public class ShowImageActivity extends AppActivity {
 					}
 				}
 			};
-			final String imageUri = Uri.fromFile(new File(images.get(position))).toString();
+			final String imageUri = Uri.fromFile(new File(mAllImages.get(position))).toString();
 //			imageViewTouchItem.setBackgroundResource(R.drawable.pic_loading);
 
 			showImage(imageUri, imageViewTouchItem, mapBitmap, handler,
@@ -414,7 +456,7 @@ public class ShowImageActivity extends AppActivity {
 
 	private String getSelectedResult(boolean haveResult) {
 		if(haveResult){
-			return getString(R.string.picker_menu, listUrl.size(), mDefaultCount);
+			return getString(R.string.picker_menu, mSelectedUrl.size(), mDefaultCount);
 		} else {
 			return getString(R.string.picker_menu_empty);
 		}
@@ -431,7 +473,7 @@ public class ShowImageActivity extends AppActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// Set 'pick' menu item state depending on count
 		MenuItem mPickMenuItem = menu.findItem(R.id.action_pick);
-		boolean haveResult = listUrl != null && !listUrl.isEmpty();
+		boolean haveResult = mSelectedUrl != null && !mSelectedUrl.isEmpty();
 		mPickMenuItem.setTitle(getSelectedResult(haveResult));
 		mPickMenuItem.setEnabled(haveResult);
 
@@ -456,12 +498,16 @@ public class ShowImageActivity extends AppActivity {
 
 	// todo: post event to notify inter-activities to close and show up the result.
 	void onSelectionSubmit() {
-		if(listUrl != null && listUrl.size() > 0){
+		if(mSelectedUrl != null && !mSelectedUrl.isEmpty()){
 			// 返回已选择的图片数据
 			Intent data = new Intent();
-			data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, listUrl);
+			data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, mSelectedUrl);
 			setResult(RESULT_OK, data);
 			finish();
 		}
+	}
+	private void refreshWithResultUi() {
+		invalidateOptionsMenu();
+		setTitle((1 + pager.getCurrentItem()) + "/" + mAllImageUrl.size());
 	}
 }

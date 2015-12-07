@@ -15,6 +15,13 @@ public class ImagePickerConstants {
     public static final String EXTRA_SHOW_CAMERA = "show_camera";
     /** 默认选择的数据集 */
     public static final String EXTRA_DEFAULT_SELECTED_LIST = "default_result";
+    /** 可选择/预览的数据集 */
+    public static final String EXTRA_All_SOURCE_LIST = "all_source";
+
+    /** 可预览的默认当前数据页,int类型 */
+    public static final String EXTRA_PREVIEW_INDEX = "preview_index";
+    public static final int DEFAULT_PREVIEW_INDEX = 0;
+
     /** 单选 */
     public static final int MODE_SINGLE = 0;
     /** 多选 */

@@ -2,7 +2,6 @@ package me.nereo.multi_image_selector;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -43,6 +42,7 @@ import me.nereo.multi_image_selector.adapter.RecyclerClickListener;
 import me.nereo.multi_image_selector.bean.Folder;
 import me.nereo.multi_image_selector.bean.Image;
 import me.nereo.multi_image_selector.utils.FileUtils;
+import me.nereo.multi_image_selector.utils.PickerUtils;
 import me.nereo.multi_image_selector.utils.TimeUtils;
 
 /**
@@ -128,7 +128,7 @@ public class MultiImageSelectorFragment extends Fragment {
 
         // 是否显示照相机
         mIsShowCamera = getArguments().getBoolean(ImagePickerConstants.EXTRA_SHOW_CAMERA, true);
-        mImageAdapter = new ImageGridAdapter(getActivity(), mIsShowCamera);
+        mImageAdapter = new ImageGridAdapter(getActivity(), mIsShowCamera, mDesireImageCount);
         // 是否显示选择指示器
         mImageAdapter.showSelectIndicator(mode == ImagePickerConstants.MODE_MULTI);
 
@@ -557,17 +557,18 @@ public class MultiImageSelectorFragment extends Fragment {
             // do nothing, should not be here as design
             Log.e(TAG, "onSelectionPreview, trigger with invalid selection count " + selectedCount);
         } else {
-            Activity activity = getActivity();
-            Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-            intent.putExtra(ImagePickerConstants.EXTRA_SELECT_COUNT, mDesireImageCount);
-            intent.putExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, resultList);
-            intent.setPackage(activity.getPackageName());
-            try {
-                activity.startActivityForResult(intent, ImagePickerConstants.REQUEST_IMAGE);
-//                activity.startActivity(intent);
-            } catch (ActivityNotFoundException ex) {
-                ex.printStackTrace();
-            }
+            PickerUtils.startPreviewActivityForResult(getActivity(), resultList, mDesireImageCount, null, 0);
+//            Activity activity = getActivity();
+//            Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+//            intent.putExtra(ImagePickerConstants.EXTRA_SELECT_COUNT, mDesireImageCount);
+//            intent.putExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, resultList);
+//            intent.setPackage(activity.getPackageName());
+//            try {
+//                activity.startActivityForResult(intent, ImagePickerConstants.REQUEST_IMAGE);
+////                activity.startActivity(intent);
+//            } catch (ActivityNotFoundException ex) {
+//                ex.printStackTrace();
+//            }
         }
     }
 }

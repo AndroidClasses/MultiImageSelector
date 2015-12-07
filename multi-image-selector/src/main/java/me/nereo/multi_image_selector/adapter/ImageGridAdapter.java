@@ -1,11 +1,13 @@
 package me.nereo.multi_image_selector.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutParams;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -16,6 +18,7 @@ import java.util.List;
 
 import me.nereo.multi_image_selector.R;
 import me.nereo.multi_image_selector.bean.Image;
+import me.nereo.multi_image_selector.utils.PickerUtils;
 
 /**
  * 图片Adapter
@@ -26,7 +29,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     private static final int TYPE_CAMERA = 0;
     private static final int TYPE_NORMAL = 1;
 
-    private Context mContext;
+    private Activity mContext;
 
     private LayoutInflater mInflater;
     private boolean showCamera = true;
@@ -38,10 +41,13 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     private int mItemSize;
     private LayoutParams mItemLayoutParams;
 
-    public ImageGridAdapter(Context context, boolean showCamera){
+    private int mMaxSelectedCount;
+
+    public ImageGridAdapter(Activity context, boolean showCamera, int maxSelectedCount){
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.showCamera = showCamera;
+        mMaxSelectedCount = maxSelectedCount;
         mItemLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
     /**
@@ -93,13 +99,14 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     }
 
     private Image getImageByPath(String path){
-        if(mImages != null && mImages.size()>0){
+        if(mImages != null){
             for(Image image : mImages){
                 if(image.path.equalsIgnoreCase(path)){
                     return image;
                 }
             }
         }
+
         return null;
     }
 
@@ -110,7 +117,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     public void setData(List<Image> images) {
         mSelectedImages.clear();
 
-        if(images != null && images.size()>0){
+        if(images != null){
             mImages = images;
         }else{
             mImages.clear();
@@ -205,7 +212,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
 
     public class ImageAdapterViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
-        ImageView indicator;
+        CheckBox indicator;
         View mask;
 
         ImageAdapterViewHolder(View view) {
@@ -214,7 +221,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
             view.setLayoutParams(mItemLayoutParams);
 
             image = (ImageView) view.findViewById(R.id.image);
-            indicator = (ImageView) view.findViewById(R.id.checkmark);
+            indicator = (CheckBox) view.findViewById(R.id.checkmark);
             mask = view.findViewById(R.id.mask);
             view.setTag(this);
 
@@ -222,11 +229,24 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
                 @Override
                 public void onClick(View v) {
                     if (null != recyclerListener) {
-                        Image image = getDataItem(getAdapterPosition());
-                        performClicked(mHolder, image);
+//                        Image image = getDataItem(getAdapterPosition());
+//                        performItemSelected(mHolder, image);
+                        performItemPreviewed(getAdapterPosition());
                     }
                 }
             });
+
+            if (null != indicator) {
+                indicator.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (null != recyclerListener) {
+                            Image image = getDataItem(getAdapterPosition());
+                            performItemSelected(mHolder, image);
+                        }
+                    }
+                });
+            }
         }
 
         void bindData(final Image data){
@@ -236,11 +256,13 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
                 indicator.setVisibility(View.VISIBLE);
                 if(mSelectedImages.contains(data)){
                     // 设置选中状态
-                    indicator.setImageResource(R.drawable.btn_selected);
+//                    indicator.setImageResource(R.drawable.btn_selected);
+                    indicator.setChecked(true);
                     mask.setVisibility(View.VISIBLE);
                 }else{
                     // 未选择
-                    indicator.setImageResource(R.drawable.btn_unselected);
+//                    indicator.setImageResource(R.drawable.btn_unselected);
+                    indicator.setChecked(false);
                     mask.setVisibility(View.GONE);
                 }
             }else{
@@ -281,10 +303,15 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
         return mHolder;
     }
 
-    protected void performClicked(ImageAdapterViewHolder holder, Image image) {
+    protected void performItemSelected(ImageAdapterViewHolder holder, Image image) {
         if (null != recyclerListener) {
             recyclerListener.onElementClick(holder, image);
         }
+    }
+
+    private void performItemPreviewed(int position) {
+        int index = isShowCamera() ? position - 1 : position;
+        PickerUtils.startPreview(mContext, mSelectedImages, mMaxSelectedCount, mImages, index);
     }
 
     private Image getDataItem(int position) {
