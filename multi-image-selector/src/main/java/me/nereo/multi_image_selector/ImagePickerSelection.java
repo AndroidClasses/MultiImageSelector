@@ -28,9 +28,13 @@ public class ImagePickerSelection {
         return _instance;
     }
 
-    public void setSourceList(ArrayList<String> tmp) {
+    public void discard() {
         resultList.clear();
         mResultFolder.clear();
+    }
+
+    public void setSourceList(ArrayList<String> tmp) {
+        discard();
         if(tmp != null && !tmp.isEmpty()) {
             resultList = tmp;
         }
@@ -88,5 +92,37 @@ public class ImagePickerSelection {
 
     public List<Folder> getFolderList() {
         return mResultFolder;
+    }
+
+    public boolean hasSelection() {
+        if (null == resultList || resultList.isEmpty()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean setSelected(String path) {
+        boolean result = false;
+        if (resultList.contains(path)) {
+            // do nothing
+        } else {
+            resultList.add(path);
+            result = true;
+        }
+        return result;
+    }
+
+    public boolean clearSelected(String path) {
+        if (null != resultList && resultList.contains(path)) {
+            resultList.remove(path);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean wasSelected(String url) {
+        return resultList.contains(url);
     }
 }

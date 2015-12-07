@@ -10,11 +10,10 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import butterknife.Bind;
 import butterknife.OnClick;
 import me.nereo.multi_image_selector.ImagePickerConstants;
+import me.nereo.multi_image_selector.ImagePickerSelection;
 
 public class MainActivity extends AppActivity {
 
@@ -46,14 +45,9 @@ public class MainActivity extends AppActivity {
         intent.putExtra(ImagePickerConstants.EXTRA_SELECT_COUNT, maxNum);
         // 选择模式
         intent.putExtra(ImagePickerConstants.EXTRA_SELECT_MODE, selectedMode);
-        // 默认选择
-        if(mSelectPath != null && mSelectPath.size() > 0){
-            intent.putExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, mSelectPath);
-        }
+
         startActivityForResult(intent, ImagePickerConstants.REQUEST_IMAGE);
     }
-
-    private ArrayList<String> mSelectPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +82,8 @@ public class MainActivity extends AppActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == ImagePickerConstants.REQUEST_IMAGE){
             if(resultCode == RESULT_OK){
-                mSelectPath = data.getStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT);
                 StringBuilder sb = new StringBuilder();
-                for(String p: mSelectPath){
+                for(String p: ImagePickerSelection.getInstance().getList()){
                     sb.append(p);
                     sb.append("\n");
                 }

@@ -14,7 +14,7 @@ public class ImagePickerConstants {
     /** 是否显示相机，boolean类型 */
     public static final String EXTRA_SHOW_CAMERA = "show_camera";
     /** 默认选择的数据集 */
-    public static final String EXTRA_DEFAULT_SELECTED_LIST = "default_result";
+//    public static final String EXTRA_DEFAULT_SELECTED_LIST = "default_result";
     /** 可选择/预览的数据集 */
     public static final String EXTRA_All_SOURCE_LIST = "all_source";
 
@@ -29,5 +29,5 @@ public class ImagePickerConstants {
 
 
     public static final int REQUEST_IMAGE = 2;
-    public static final String EXTRA_RESULT = "select_result";
+//    public static final String EXTRA_RESULT = "select_result";
 }

@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.nereo.multi_image_selector.ImagePickerSelection;
 import me.nereo.multi_image_selector.R;
 import me.nereo.multi_image_selector.bean.Image;
 import me.nereo.multi_image_selector.utils.PickerUtils;
@@ -36,12 +37,14 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
     private boolean showSelectIndicator = true;
 
     private List<Image> mImages = new ArrayList<>();
-    private List<Image> mSelectedImages = new ArrayList<>();
+//    private List<Image> mSelectedImages = new ArrayList<>();
 
     private int mItemSize;
     private LayoutParams mItemLayoutParams;
 
     private int mMaxSelectedCount;
+
+    private ImagePickerSelection mImageSelection;
 
     public ImageGridAdapter(Activity context, boolean showCamera, int maxSelectedCount){
         mContext = context;
@@ -49,6 +52,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
         this.showCamera = showCamera;
         mMaxSelectedCount = maxSelectedCount;
         mItemLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        mImageSelection = ImagePickerSelection.getInstance();
     }
     /**
      * 显示选择指示器
@@ -69,53 +73,52 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
         return showCamera;
     }
 
-    /**
-     * 选择某个图片，改变选择状态
-     * @param image
-     */
-    public void select(Image image) {
-        if(mSelectedImages.contains(image)){
-            mSelectedImages.remove(image);
-        }else{
-            mSelectedImages.add(image);
-        }
-        notifyDataSetChanged();
-    }
+//    /**
+//     * 选择某个图片，改变选择状态
+//     * @param image
+//     */
+//    public void select(Image image) {
+//        if (0 == mImageSelection.toggleSelection(image.path, mMaxSelectedCount)) {
+//            // do nothing while maximum selection count reach.
+//        } else {
+//            notifyDataSetChanged();
+//        }
+//    }
 
     /**
      * 通过图片路径设置默认选择
      * @param resultList
      */
-    public void setDefaultSelected(ArrayList<String> resultList) {
-        for(String path : resultList){
-            Image image = getImageByPath(path);
-            if(image != null){
-                mSelectedImages.add(image);
-            }
-        }
-        if(mSelectedImages.size() > 0){
-            notifyDataSetChanged();
-        }
-    }
+//    public void setDefaultSelected(ArrayList<String> resultList) {
+//        for(String path : resultList){
+//            Image image = getImageByPath(path);
+//            if(image != null){
+//                mSelectedImages.add(image);
+//            }
+//        }
+//        if(mSelectedImages.size() > 0){
+//            notifyDataSetChanged();
+//        }
+//    }
 
-    private Image getImageByPath(String path){
-        if(mImages != null){
-            for(Image image : mImages){
-                if(image.path.equalsIgnoreCase(path)){
-                    return image;
-                }
-            }
-        }
-
-        return null;
-    }
+//    private Image getImageByPath(String path){
+//        if(mImages != null){
+//            for(Image image : mImages){
+//                if(image.path.equalsIgnoreCase(path)){
+//                    return image;
+//                }
+//            }
+//        }
+//
+//        return null;
+//    }
 
     /**
      * 设置数据集
      * @param images
      */
     public void setData(List<Image> images) {
-        mSelectedImages.clear();
+//        mSelectedImages.clear();
 
         if(images != null){
             mImages = images;
@@ -254,7 +257,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
             // 处理单选和多选状态
             if(showSelectIndicator){
                 indicator.setVisibility(View.VISIBLE);
-                if(mSelectedImages.contains(data)){
+                if(mImageSelection.wasSelected(data.path)){
                     // 设置选中状态
 //                    indicator.setImageResource(R.drawable.btn_selected);
                     indicator.setChecked(true);
@@ -314,10 +317,10 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Imag
             if (position == 0) { // start camera outside
                 performItemSelected(holder, null);
             } else {
-                PickerUtils.startPreview(mContext, mSelectedImages, mMaxSelectedCount, mImages, position - 1);
+                PickerUtils.startPreview(mContext, mMaxSelectedCount, mImages, position - 1);
             }
         } else {
-            PickerUtils.startPreview(mContext, mSelectedImages, mMaxSelectedCount, mImages, position);
+            PickerUtils.startPreview(mContext, mMaxSelectedCount, mImages, position);
         }
     }
 

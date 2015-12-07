@@ -14,26 +14,21 @@ import me.nereo.multi_image_selector.bean.Image;
  * Created by yangfeng on 15-12-7.
  */
 public class PickerUtils {
-    public static void startPreview(Activity activity, List<Image> selectedList,
+    public static void startPreview(Activity activity,
                                                      int maxSelectedCount, List<Image> allList,
                                                      int previewIndex) {
-        ArrayList<String> selection = new ArrayList<String>();
-        for (Image image : selectedList) {
-            selection.add(image.path);
-        }
         ArrayList<String> all = new ArrayList<String>();
         for (Image image : allList) {
             all.add(image.path);
         }
 
-        startPreviewActivityForResult(activity, selection, maxSelectedCount, all, previewIndex);
+        startPreviewActivityForResult(activity, maxSelectedCount, all, previewIndex);
     }
-    public static void startPreviewActivityForResult(Activity activity, ArrayList<String> selectedList,
+    public static void startPreviewActivityForResult(Activity activity,
                                                      int maxSelectedCount, ArrayList<String> allList,
                                                      int previewIndex) {
         Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         intent.putExtra(ImagePickerConstants.EXTRA_SELECT_COUNT, maxSelectedCount);
-        intent.putExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, selectedList);
         intent.putExtra(ImagePickerConstants.EXTRA_All_SOURCE_LIST, allList);
         intent.putExtra(ImagePickerConstants.EXTRA_PREVIEW_INDEX, previewIndex);
         intent.setPackage(activity.getPackageName());

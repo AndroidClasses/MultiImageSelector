@@ -2,6 +2,8 @@ package me.nereo.multi_image_selector;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -36,6 +38,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.Subscribe;
 import me.nereo.multi_image_selector.adapter.FolderAdapter;
 import me.nereo.multi_image_selector.adapter.ImageGridAdapter;
 import me.nereo.multi_image_selector.adapter.RecyclerClickListener;
@@ -95,7 +98,7 @@ public class MultiImageSelectorFragment extends Fragment {
 
         try {
             mCallback = (Callback) activity;
-        }catch (ClassCastException e){
+        } catch (ClassCastException e) {
             throw new ClassCastException("The Activity must implement MultiImageSelectorFragment.Callback interface...");
         }
     }
@@ -118,10 +121,10 @@ public class MultiImageSelectorFragment extends Fragment {
         final int mode = getArguments().getInt(ImagePickerConstants.EXTRA_SELECT_MODE);
 
         // 默认选择
-        if(mode == ImagePickerConstants.MODE_MULTI) {
-            ArrayList<String> tmp = getArguments().getStringArrayList(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
-            mImageSelection.setSourceList(tmp);
-        }
+//        if(mode == ImagePickerConstants.MODE_MULTI) {
+//            ArrayList<String> tmp = getArguments().getStringArrayList(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
+//            mImageSelection.setSourceList(tmp);
+//        }
 
         // 是否显示照相机
         mIsShowCamera = getArguments().getBoolean(ImagePickerConstants.EXTRA_SHOW_CAMERA, true);
@@ -142,7 +145,7 @@ public class MultiImageSelectorFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                if(mFolderPopupWindow == null){
+                if (mFolderPopupWindow == null) {
                     createPopupFolderList(mGridWidth, mGridHeight);
                 }
 
@@ -178,23 +181,23 @@ public class MultiImageSelectorFragment extends Fragment {
             public void onScrollStateChanged(RecyclerView absListView, int state) {
 
                 final Picasso picasso = Picasso.with(getActivity());
-                if(state == RecyclerView.SCROLL_STATE_IDLE || state == RecyclerView.SCROLL_STATE_DRAGGING){
+                if (state == RecyclerView.SCROLL_STATE_IDLE || state == RecyclerView.SCROLL_STATE_DRAGGING) {
                     picasso.resumeTag(getActivity());
-                }else{
+                } else {
                     picasso.pauseTag(getActivity());
                 }
 
-                if(state == RecyclerView.SCROLL_STATE_IDLE){
+                if (state == RecyclerView.SCROLL_STATE_IDLE) {
                     // 停止滑动，日期指示器消失
                     mTimeLineText.setVisibility(View.GONE);
-                } else if(state == RecyclerView.SCROLL_STATE_SETTLING){
+                } else if (state == RecyclerView.SCROLL_STATE_SETTLING) {
                     mTimeLineText.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onScrolled(RecyclerView view, int dx, int dy) {
-                if(mTimeLineText.getVisibility() == View.VISIBLE) {
+                if (mTimeLineText.getVisibility() == View.VISIBLE) {
                     int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
                     int index = firstVisibleItem;
                     Image image = mImageAdapter.getItem(index);
@@ -207,7 +210,8 @@ public class MultiImageSelectorFragment extends Fragment {
 
         mGridView.setAdapter(mImageAdapter);
         mGridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             public void onGlobalLayout() {
 
                 final int width = mGridView.getWidth();
@@ -219,12 +223,12 @@ public class MultiImageSelectorFragment extends Fragment {
                 final int desireSize = getResources().getDimensionPixelOffset(R.dimen.image_size);
                 final int numCount = width / desireSize;
                 final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.space_size);
-                int columnWidth = (width - columnSpace*(numCount-1)) / numCount;
+                int columnWidth = (width - columnSpace * (numCount - 1)) / numCount;
                 mImageAdapter.setItemSize(columnWidth);
 
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     mGridView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }else{
+                } else {
                     mGridView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
             }
@@ -233,15 +237,15 @@ public class MultiImageSelectorFragment extends Fragment {
         mImageAdapter.setOnItemClickListener(new RecyclerClickListener() {
             @Override
             public void onElementClick(ImageGridAdapter.ImageAdapterViewHolder holder, Image image) {
-                if(mImageAdapter.isShowCamera()){
+                if (mImageAdapter.isShowCamera()) {
                     // 如果显示照相机，则第一个Grid显示为照相机，处理特殊逻辑
-                    if(null == image){
+                    if (null == image) {
                         showCameraAction();
-                    }else{
+                    } else {
                         // 正常操作
                         selectImageFromGrid(image, mode);
                     }
-                }else{
+                } else {
                     // 正常操作
                     selectImageFromGrid(image, mode);
                 }
@@ -291,10 +295,10 @@ public class MultiImageSelectorFragment extends Fragment {
                                 mImageAdapter.setData(folder.images);
                                 mCategoryText.setText(folder.name);
                                 // 设定默认选择
-                                ArrayList<String> resultList = mImageSelection.getList();
-                                if (resultList != null && resultList.size() > 0) {
-                                    mImageAdapter.setDefaultSelected(resultList);
-                                }
+//                                ArrayList<String> resultList = mImageSelection.getList();
+//                                if (resultList != null && resultList.size() > 0) {
+//                                    mImageAdapter.setDefaultSelected(resultList);
+//                                }
                             }
                             mImageAdapter.setShowCamera(false);
                         }
@@ -319,15 +323,15 @@ public class MultiImageSelectorFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // 相机拍照完成后，返回图片路径
-        if(requestCode == REQUEST_CAMERA){
-            if(resultCode == Activity.RESULT_OK) {
+        if (requestCode == REQUEST_CAMERA) {
+            if (resultCode == Activity.RESULT_OK) {
                 if (mTmpFile != null) {
                     if (mCallback != null) {
                         mCallback.onCameraShot(mTmpFile);
                     }
                 }
-            }else{
-                if(mTmpFile != null && mTmpFile.exists()){
+            } else {
+                if (mTmpFile != null && mTmpFile.exists()) {
                     mTmpFile.delete();
                 }
             }
@@ -338,8 +342,8 @@ public class MultiImageSelectorFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         Log.d(TAG, "on change");
 
-        if(mFolderPopupWindow != null){
-            if(mFolderPopupWindow.isShowing()){
+        if (mFolderPopupWindow != null) {
+            if (mFolderPopupWindow.isShowing()) {
                 mFolderPopupWindow.dismiss();
             }
         }
@@ -382,47 +386,48 @@ public class MultiImageSelectorFragment extends Fragment {
     private void showCameraAction() {
         // 跳转到系统照相机
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(cameraIntent.resolveActivity(getActivity().getPackageManager()) != null){
+        if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             // 设置系统相机拍照后的输出路径
             // 创建临时文件
             mTmpFile = FileUtils.createTmpFile(getActivity());
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mTmpFile));
             startActivityForResult(cameraIntent, REQUEST_CAMERA);
-        }else{
+        } else {
             Toast.makeText(getActivity(), R.string.msg_no_camera, Toast.LENGTH_SHORT).show();
         }
     }
 
     /**
      * 选择图片操作
+     *
      * @param image
      */
     private void selectImageFromGrid(Image image, int mode) {
-        if(image != null) {
+        if (image != null) {
             // 多选模式
-            if(mode == ImagePickerConstants.MODE_MULTI) {
+            if (mode == ImagePickerConstants.MODE_MULTI) {
                 int result = mImageSelection.toggleSelection(image.path, mDesireImageCount);
                 if (result < 0) {
-                    refreshWithResultUi();
                     if (mCallback != null) {
                         mCallback.onImageUnselected(image.path);
                     }
                 } else {
                     // 判断选择数量问题
-                    if(result == 0){
+                    if (result == 0) {
                         Toast.makeText(getActivity(), R.string.msg_amount_limit, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    refreshWithResultUi();
                     if (mCallback != null) {
                         mCallback.onImageSelected(image.path);
                     }
                 }
-                mImageAdapter.select(image);
-            }else if(mode == ImagePickerConstants.MODE_SINGLE){
+//                mImageAdapter.select(image);
+                mImageAdapter.notifyDataSetChanged();
+                refreshWithResultUi();
+            } else if (mode == ImagePickerConstants.MODE_SINGLE) {
                 // 单选模式
-                if(mCallback != null){
+                if (mCallback != null) {
                     mCallback.onSingleImageSelected(image.path);
                 }
             }
@@ -435,19 +440,19 @@ public class MultiImageSelectorFragment extends Fragment {
                 MediaStore.Images.Media.DATA,
                 MediaStore.Images.Media.DISPLAY_NAME,
                 MediaStore.Images.Media.DATE_ADDED,
-                MediaStore.Images.Media._ID };
+                MediaStore.Images.Media._ID};
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            if(id == LOADER_ALL) {
+            if (id == LOADER_ALL) {
                 CursorLoader cursorLoader = new CursorLoader(getActivity(),
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_PROJECTION,
                         null, null, IMAGE_PROJECTION[2] + " DESC");
                 return cursorLoader;
-            }else if(id == LOADER_CATEGORY){
+            } else if (id == LOADER_CATEGORY) {
                 CursorLoader cursorLoader = new CursorLoader(getActivity(),
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_PROJECTION,
-                        IMAGE_PROJECTION[0]+" like '%"+args.getString("path")+"%'", null, IMAGE_PROJECTION[2] + " DESC");
+                        IMAGE_PROJECTION[0] + " like '%" + args.getString("path") + "%'", null, IMAGE_PROJECTION[2] + " DESC");
                 return cursorLoader;
             }
 
@@ -468,7 +473,7 @@ public class MultiImageSelectorFragment extends Fragment {
                         Image image = new Image(path, name, dateTime);
                         allLoadedImages.add(image);
 
-                        if(hasFolderGened ) {
+                        if (hasFolderGened) {
                             // do nothing as we generated folder before
                         } else {
                             mImageSelection.parseFolder(image, path);
@@ -479,10 +484,10 @@ public class MultiImageSelectorFragment extends Fragment {
                     mImageAdapter.setData(allLoadedImages);
 
                     // 设定默认选择
-                    ArrayList<String> resultList = mImageSelection.getList();
-                    if(resultList != null && !resultList.isEmpty()){
-                        mImageAdapter.setDefaultSelected(resultList);
-                    }
+//                    ArrayList<String> resultList = mImageSelection.getList();
+//                    if(resultList != null && !resultList.isEmpty()){
+//                        mImageAdapter.setDefaultSelected(resultList);
+//                    }
 
                     mFolderAdapter.setData(mImageSelection.getFolderList());
                     hasFolderGened = true;
@@ -499,16 +504,19 @@ public class MultiImageSelectorFragment extends Fragment {
     /**
      * 回调接口
      */
-    public interface Callback{
+    public interface Callback {
         void onSingleImageSelected(String path);
+
         void onImageSelected(String path);
+
         void onImageUnselected(String path);
+
         void onCameraShot(File imageFile);
     }
 
     private void refreshWithResultUi() {
         int selectedCount = mImageSelection.getSelectedCount();
-        if(selectedCount <= 0) {
+        if (selectedCount <= 0) {
             mPreviewBtn.setEnabled(false);
             mPreviewBtn.setText(R.string.preview);
         } else {
@@ -524,7 +532,15 @@ public class MultiImageSelectorFragment extends Fragment {
             // do nothing, should not be here as design
             Log.e(TAG, "onSelectionPreview, trigger with invalid selection count " + selectedCount);
         } else {
-            PickerUtils.startPreviewActivityForResult(getActivity(), mImageSelection.getList(), mDesireImageCount, null, 0);
+            PickerUtils.startPreviewActivityForResult(getActivity(), mDesireImageCount, null, 0);
         }
+    }
+
+    @Subscribe
+    public void onEvent(SelectionChangeEvent event) {
+//    public void onEventMainThread(Object event) {
+//        if (event instanceof SelectionChangeEvent) {
+            mImageAdapter.notifyDataSetChanged();
+//        }
     }
 }

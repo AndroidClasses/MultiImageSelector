@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener;
 import me.nereo.multi_image_selector.ImagePickerConstants;
+import me.nereo.multi_image_selector.ImagePickerSelection;
 
 /**
  * @brief 图片展示页面，支持多点触摸放大缩小
@@ -55,7 +56,7 @@ public class ShowImageActivity extends AppActivity {
 
 	private Bitmap mBitmap;
 
-	private ArrayList<String> mSelectedUrl = new ArrayList<String>();
+//	private ArrayList<String> mSelectedUrl = new ArrayList<String>();
 	private static Map<String, Bitmap> mapBitmap;
 
 	private int mDefaultCount;
@@ -70,6 +71,8 @@ public class ShowImageActivity extends AppActivity {
 	private ArrayList<String> mAllImageUrl = new ArrayList<String>();
 	private int mDefaultPreviewIndex;
 
+	private ImagePickerSelection mImageSelection;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -78,9 +81,10 @@ public class ShowImageActivity extends AppActivity {
 		init();
 	}
 
-
 	private void init() {
 		initImageLoader(this);
+
+		mImageSelection = ImagePickerSelection.getInstance();
 
 		if (null == mapBitmap) {
 			mapBitmap = new HashMap<String, Bitmap>();
@@ -97,25 +101,26 @@ public class ShowImageActivity extends AppActivity {
 
 		mDefaultPreviewIndex = intent.getIntExtra(ImagePickerConstants.EXTRA_PREVIEW_INDEX, ImagePickerConstants.DEFAULT_PREVIEW_INDEX);
 
-		if (intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
-			ArrayList<String> resultList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
-			if (null != resultList) {
-				mSelectedUrl.addAll(resultList);
-			}
-		} else {
+//		if (intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
+//			ArrayList<String> resultList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
+//			if (null != resultList) {
+//				mSelectedUrl.addAll(resultList);
+//			}
+//		} else {
 			Bundle bd = intent.getExtras();
 			if (bd != null) {
 				String imageUrl = bd.getString(KEY_PIC);
-				if (TextUtils.isDigitsOnly(imageUrl)) {
-					mSelectedUrl.add(imageUrl);
+				if (!TextUtils.isEmpty(imageUrl)) {
+//					mSelectedUrl.add(imageUrl);
+					mImageSelection.setSelected(imageUrl);
 				}
 			}
-		}
+//		}
 
 		if (intent.hasExtra(ImagePickerConstants.EXTRA_All_SOURCE_LIST)) {
 			ArrayList<String> allList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_All_SOURCE_LIST);
 			if (null == allList || allList.isEmpty()) {
-				mAllImageUrl.addAll(mSelectedUrl);
+				mAllImageUrl.addAll(mImageSelection.getList());
 			} else {
 				mAllImageUrl = allList;
 			}
@@ -132,14 +137,10 @@ public class ShowImageActivity extends AppActivity {
 		pager.setAdapter(mImagePagerAdapter);
 		pager.setCurrentItem(mDefaultPreviewIndex);
 
-		refreshWithResultUi();
-
 		// 设置滑动监听器
 		pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageSelected(int arg0) {
-				String url = mAllImageUrl.get(pager.getCurrentItem());
-				mPageCheckMask.setChecked(mSelectedUrl.contains(url));
 				refreshWithResultUi();
 			}
 
@@ -160,13 +161,17 @@ public class ShowImageActivity extends AppActivity {
 				int currentItem = pager.getCurrentItem();
 				String currentUrl = mAllImageUrl.get(currentItem);
 				if (isChecked) {
-					mSelectedUrl.add(currentUrl);
+					mImageSelection.setSelected(currentUrl);
+//					mSelectedUrl.add(currentUrl);
 				} else {
-					mSelectedUrl.remove(currentUrl);
+					mImageSelection.clearSelected(currentUrl);
+//					mSelectedUrl.remove(currentUrl);
 				}
 				refreshWithResultUi();
 			}
 		});
+
+		refreshWithResultUi();
 	}
 
 	// 获取状态栏的高度
@@ -398,7 +403,7 @@ public class ShowImageActivity extends AppActivity {
 
 	private String getSelectedResult(boolean haveResult) {
 		if(haveResult){
-			return getString(R.string.picker_menu, mSelectedUrl.size(), mDefaultCount);
+			return getString(R.string.picker_menu, mImageSelection.getSelectedCount(), mDefaultCount);
 		} else {
 			return getString(R.string.picker_menu_empty);
 		}
@@ -415,7 +420,7 @@ public class ShowImageActivity extends AppActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// Set 'pick' menu item state depending on count
 		MenuItem mPickMenuItem = menu.findItem(R.id.action_pick);
-		boolean haveResult = mSelectedUrl != null && !mSelectedUrl.isEmpty();
+		boolean haveResult = mImageSelection.hasSelection();
 		mPickMenuItem.setTitle(getSelectedResult(haveResult));
 		mPickMenuItem.setEnabled(haveResult);
 
@@ -440,17 +445,26 @@ public class ShowImageActivity extends AppActivity {
 
 	// todo: post event to notify inter-activities to close and show up the result.
 	void onSelectionSubmit() {
-		if(mSelectedUrl != null && !mSelectedUrl.isEmpty()){
+		if(mImageSelection.hasSelection()){
 			// 返回已选择的图片数据
-			Intent data = new Intent();
-			data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, mSelectedUrl);
-			setResult(RESULT_OK, data);
+			setResult(RESULT_OK);
 			finish();
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		setResult(RESULT_CANCELED);
+		finish();
 	}
 
 	private void refreshWithResultUi() {
 		invalidateOptionsMenu();
 		setTitle((1 + pager.getCurrentItem()) + "/" + mAllImageUrl.size());
+
+		if (null != mPageCheckMask) {
+			String url = mAllImageUrl.get(pager.getCurrentItem());
+			mPageCheckMask.setChecked(mImageSelection.wasSelected(url));
+		}
 	}
 }

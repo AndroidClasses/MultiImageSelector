@@ -7,10 +7,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.io.File;
-import java.util.ArrayList;
 
+import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.ImagePickerConstants;
+import me.nereo.multi_image_selector.ImagePickerSelection;
 import me.nereo.multi_image_selector.MultiImageSelectorFragment;
+import me.nereo.multi_image_selector.SelectionChangeEvent;
 
 /**
  * 多图选择
@@ -18,22 +20,30 @@ import me.nereo.multi_image_selector.MultiImageSelectorFragment;
  */
 public class MultiImageSelectorActivity extends AppActivity implements MultiImageSelectorFragment.Callback {
     void onSelectionSubmit() {
-        if(resultList != null && resultList.size() > 0){
+        if(mImageSelection.hasSelection()){
             // 返回已选择的图片数据
-            Intent data = new Intent();
-            data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, resultList);
-            setResult(RESULT_OK, data);
+            setResult(RESULT_OK);
             finish();
         }
     }
 
-    private ArrayList<String> resultList = new ArrayList<>();
     private int mDefaultCount;
+
+    private ImagePickerSelection mImageSelection;
+
+    private Fragment myFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_default);
+        mImageSelection = ImagePickerSelection.getInstance();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(myFragment);
     }
 
     @Override
@@ -45,26 +55,28 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
                 ImagePickerConstants.DEFAULT_MAX_COUNT);
         int mode = intent.getIntExtra(ImagePickerConstants.EXTRA_SELECT_MODE, ImagePickerConstants.MODE_MULTI);
         boolean isShow = intent.getBooleanExtra(ImagePickerConstants.EXTRA_SHOW_CAMERA, true);
-        if (mode == ImagePickerConstants.MODE_MULTI && intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
-            resultList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
-        }
+//        if (mode == ImagePickerConstants.MODE_MULTI && intent.hasExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST)) {
+//            resultList = intent.getStringArrayListExtra(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST);
+//        }
 
         Bundle bundle = new Bundle();
         bundle.putInt(ImagePickerConstants.EXTRA_SELECT_COUNT, mDefaultCount);
         bundle.putInt(ImagePickerConstants.EXTRA_SELECT_MODE, mode);
         bundle.putBoolean(ImagePickerConstants.EXTRA_SHOW_CAMERA, isShow);
-        bundle.putStringArrayList(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, resultList);
+//        bundle.putStringArrayList(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, resultList);
 
+        myFragment = Fragment.instantiate(this, MultiImageSelectorFragment.class.getName(), bundle);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.image_grid, Fragment.instantiate(this, MultiImageSelectorFragment.class.getName(), bundle))
+                .add(R.id.image_grid, myFragment)
                 .commit();
+        EventBus.getDefault().register(myFragment);
 
         refreshWithResultUi();
     }
 
     private String getSelectedResult(boolean haveResult) {
         if(haveResult){
-            return getString(R.string.picker_menu, resultList.size(), mDefaultCount);
+            return getString(R.string.picker_menu, mImageSelection.getSelectedCount(), mDefaultCount);
         } else {
             return getString(R.string.picker_menu_empty);
         }
@@ -72,36 +84,29 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
 
     @Override
     public void onSingleImageSelected(String path) {
-        Intent data = new Intent();
-        resultList.add(path);
-        data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, resultList);
-        setResult(RESULT_OK, data);
+        mImageSelection.discard();
+        mImageSelection.setSelected(path);
+        setResult(RESULT_OK);
         finish();
     }
 
     @Override
     public void onImageSelected(String path) {
-        if(null != resultList && !resultList.contains(path)) {
-            resultList.add(path);
-        }
+        mImageSelection.setSelected(path);
         refreshWithResultUi();
     }
 
     @Override
     public void onImageUnselected(String path) {
-        if (null != resultList && resultList.contains(path)) {
-            resultList.remove(path);
-        }
+        mImageSelection.clearSelected(path);
         refreshWithResultUi();
     }
 
     @Override
     public void onCameraShot(File imageFile) {
         if(imageFile != null) {
-            Intent data = new Intent();
-            resultList.add(imageFile.getAbsolutePath());
-            data.putStringArrayListExtra(ImagePickerConstants.EXTRA_RESULT, resultList);
-            setResult(RESULT_OK, data);
+            mImageSelection.setSelected(imageFile.getPath());
+            setResult(RESULT_OK);
             finish();
         }
     }
@@ -117,7 +122,7 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Set 'pick' menu item state depending on count
         MenuItem mPickMenuItem = menu.findItem(R.id.action_pick);
-        boolean haveResult = resultList != null && !resultList.isEmpty();
+        boolean haveResult = mImageSelection.hasSelection();
         mPickMenuItem.setTitle(getSelectedResult(haveResult));
         mPickMenuItem.setEnabled(haveResult);
 
@@ -143,15 +148,23 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == ImagePickerConstants.REQUEST_IMAGE){ // todo: apply Bus system and redesign these.
-            if(resultCode == RESULT_OK){
+        if(requestCode == ImagePickerConstants.REQUEST_IMAGE){
+            if (resultCode == RESULT_OK) {
                 // forward the result from preview activity
                 onSelectionSubmit();
+            } else {
+                EventBus.getDefault().post(new SelectionChangeEvent());
             }
         }
     }
 
     private void refreshWithResultUi() {
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mImageSelection.discard();
     }
 }
