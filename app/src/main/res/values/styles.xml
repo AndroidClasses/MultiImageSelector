@@ -1,11 +1,11 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/brand_primary</item>
-        <item name="colorPrimaryDark">@color/brand_primary_dark</item>
-        <item name="colorAccent">@color/brand_secondary</item>
-        <item name="actionMenuTextColor">@android:color/white</item>
-    </style>
+    <!--&lt;!&ndash; Base application theme. &ndash;&gt;-->
+    <!--<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
+        <!--<item name="colorPrimary">@color/brand_primary</item>-->
+        <!--<item name="colorPrimaryDark">@color/brand_primary_dark</item>-->
+        <!--<item name="colorAccent">@color/brand_secondary</item>-->
+        <!--<item name="actionMenuTextColor">@android:color/white</item>-->
+    <!--</style>-->
 
 </resources>

@@ -18,19 +18,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:configChanges="orientation|screenSize"
-            android:label="@string/activity_picker_title"
-            android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity" />
-
-        <!--<activity android:name=".GestureImageActivity" />-->
-        <activity android:name="me.nereo.multi_image_selector.ShowImageActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
     </application>
 
 </manifest>
