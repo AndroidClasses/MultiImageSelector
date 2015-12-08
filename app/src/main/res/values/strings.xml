@@ -11,6 +11,4 @@
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="go_select">Select</string>
-
-    <string name="image_loading">Loading image&#8230;</string>
 </resources>

@@ -13,4 +13,6 @@
     <string name="picker_menu_empty">OK</string>
     <string name="preview_action_check">Select</string>
     <string name="picker_menu">OK(%1$s/%2$s)</string>
+
+    <string name="image_loading">Loading image&#8230;</string>
 </resources>

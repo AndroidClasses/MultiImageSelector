@@ -1,4 +1,4 @@
-package me.nereo.multiimageselector;
+package me.nereo.multi_image_selector.view;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;

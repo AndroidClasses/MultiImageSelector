@@ -3,4 +3,11 @@
     <dimen name="image_size">120dp</dimen>
     <dimen name="space_size">2dp</dimen>
     <dimen name="folder_cover_size">72dp</dimen>
+
+    <!-- 大图页 -->
+    <dimen name="photo_detail_progress_w">240dp</dimen>
+    <dimen name="photo_detail_progress_margin_t">320dp</dimen>
+    <dimen name="photo_detail_txt_progress_margin_t">300dp</dimen>
+    <dimen name="photo_detail_but_text_size">12sp</dimen>
+
 </resources>

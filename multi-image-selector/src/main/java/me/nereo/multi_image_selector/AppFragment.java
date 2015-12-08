@@ -2,7 +2,9 @@ package me.nereo.multi_image_selector;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
+import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.Subscribe;
 
@@ -49,5 +51,13 @@ public class AppFragment extends Fragment {
 
     protected void postBusEvent(Object busEvent) {
         EventBus.getDefault().post(busEvent);
+    }
+
+    public <T extends View> T  findById(int resId) {
+        return findById(getView(), resId);
+    }
+
+    public static <T extends View> T  findById(View view, int resId) {
+        return ButterKnife.findById(view, resId);
     }
 }

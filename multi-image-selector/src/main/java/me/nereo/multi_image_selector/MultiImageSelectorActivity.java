@@ -1,4 +1,4 @@
-package me.nereo.multiimageselector;
+package me.nereo.multi_image_selector;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,11 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.io.File;
-
-import me.nereo.multi_image_selector.ImagePickerConstants;
-import me.nereo.multi_image_selector.ImagePickerSelection;
-import me.nereo.multi_image_selector.MultiImageSelectorFragment;
-import me.nereo.multi_image_selector.SelectionChangeEvent;
 
 /**
  * 多图选择

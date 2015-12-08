@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import me.nereo.multi_image_selector.AppActivity;
 import me.nereo.multi_image_selector.ImagePickerConstants;
 import me.nereo.multi_image_selector.ImagePickerSelection;
+import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 
 public class MainActivity extends AppActivity {
 

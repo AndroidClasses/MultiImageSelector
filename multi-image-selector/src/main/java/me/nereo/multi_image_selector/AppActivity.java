@@ -1,12 +1,12 @@
-package me.nereo.multiimageselector;
+package me.nereo.multi_image_selector;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.Subscribe;
@@ -15,7 +15,6 @@ import de.greenrobot.event.Subscribe;
  * Created by yangfeng on 15-10-31.
  */
 public class AppActivity extends AppCompatActivity {
-    @Bind(R.id.activity_toolbar)
     Toolbar mToolbar;
 
     @Override
@@ -28,6 +27,8 @@ public class AppActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         ButterKnife.bind(this);
+
+        mToolbar = ButterKnife.findById(this, R.id.activity_toolbar);
 
         setTitle(getTitle());
 
@@ -91,5 +92,9 @@ public class AppActivity extends AppCompatActivity {
 
     protected void postBusEvent(Object busEvent) {
         EventBus.getDefault().post(busEvent);
+    }
+
+    public <T extends View> T  findById(int resId) {
+        return ButterKnife.findById(this, resId);
     }
 }

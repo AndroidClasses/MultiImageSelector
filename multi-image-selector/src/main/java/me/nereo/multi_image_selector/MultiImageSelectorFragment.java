@@ -13,11 +13,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
@@ -131,13 +129,13 @@ public class MultiImageSelectorFragment extends AppFragment {
         // 是否显示选择指示器
         mImageAdapter.showSelectIndicator(mode == ImagePickerConstants.MODE_MULTI);
 
-        mPopupAnchorView = view.findViewById(R.id.footer);
+        mPopupAnchorView = findById(view, R.id.footer);
 
-        mTimeLineText = (TextView) view.findViewById(R.id.timeline_area);
+        mTimeLineText = findById(R.id.timeline_area);
         // 初始化，先隐藏当前timeline
         mTimeLineText.setVisibility(View.GONE);
 
-        mCategoryText = (TextView) view.findViewById(R.id.category_btn);
+        mCategoryText = findById(view, R.id.category_btn);
         // 初始化，加载所有图片
         mCategoryText.setText(R.string.folder_all);
         mCategoryText.setOnClickListener(new View.OnClickListener() {
@@ -159,7 +157,7 @@ public class MultiImageSelectorFragment extends AppFragment {
             }
         });
 
-        mPreviewBtn = (Button) view.findViewById(R.id.preview);
+        mPreviewBtn = findById(view, R.id.preview);
         // 初始化，按钮状态初始化
         refreshWithResultUi();
 
@@ -170,7 +168,7 @@ public class MultiImageSelectorFragment extends AppFragment {
             }
         });
 
-        mGridView = (RecyclerView) view.findViewById(R.id.grid);
+        mGridView = findById(view, R.id.grid);
 
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mGridView.setLayoutManager(mLayoutManager);
