@@ -17,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
@@ -50,7 +51,7 @@ import me.nereo.multi_image_selector.utils.TimeUtils;
  * 图片选择Fragment
  * Created by Nereo on 2015/4/7.
  */
-public class MultiImageSelectorFragment extends Fragment {
+public class MultiImageSelectorFragment extends AppFragment {
     private static final String TAG = "MultiImageSelector";
 
     // 不同loader定义
@@ -538,5 +539,10 @@ public class MultiImageSelectorFragment extends Fragment {
     public void onEvent(SelectionChangeEvent event) {
         mImageAdapter.notifyDataSetChanged();
         refreshWithResultUi();
+    }
+
+    @Override
+    protected boolean isEventBusEnabled() {
+        return true;
     }
 }

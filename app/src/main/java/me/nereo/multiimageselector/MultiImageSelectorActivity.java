@@ -8,7 +8,6 @@ import android.view.MenuItem;
 
 import java.io.File;
 
-import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.ImagePickerConstants;
 import me.nereo.multi_image_selector.ImagePickerSelection;
 import me.nereo.multi_image_selector.MultiImageSelectorFragment;
@@ -31,8 +30,6 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
 
     private ImagePickerSelection mImageSelection;
 
-    private Fragment myFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +40,6 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(myFragment);
     }
 
     @Override
@@ -65,11 +61,9 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
         bundle.putBoolean(ImagePickerConstants.EXTRA_SHOW_CAMERA, isShow);
 //        bundle.putStringArrayList(ImagePickerConstants.EXTRA_DEFAULT_SELECTED_LIST, resultList);
 
-        myFragment = Fragment.instantiate(this, MultiImageSelectorFragment.class.getName(), bundle);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.image_grid, myFragment)
+                .add(R.id.image_grid, Fragment.instantiate(this, MultiImageSelectorFragment.class.getName(), bundle))
                 .commit();
-        EventBus.getDefault().register(myFragment);
 
         refreshWithResultUi();
     }
@@ -153,7 +147,7 @@ public class MultiImageSelectorActivity extends AppActivity implements MultiImag
                 // forward the result from preview activity
                 onSelectionSubmit();
             } else {
-                EventBus.getDefault().post(new SelectionChangeEvent());
+                postBusEvent(new SelectionChangeEvent());
                 refreshWithResultUi();
             }
         }
