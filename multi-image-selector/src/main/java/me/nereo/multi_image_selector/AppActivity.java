@@ -1,6 +1,7 @@
 package me.nereo.multi_image_selector;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -96,5 +97,10 @@ public class AppActivity extends AppCompatActivity {
 
     public <T extends View> T  findById(int resId) {
         return ButterKnife.findById(this, resId);
+    }
+    
+    protected void showSelectedLimitationPrompt(View view, int maxCount) {
+        String prompt = getString(R.string.msg_amount_limit, maxCount);
+        Snackbar.make(view, prompt, Snackbar.LENGTH_SHORT).show();
     }
 }

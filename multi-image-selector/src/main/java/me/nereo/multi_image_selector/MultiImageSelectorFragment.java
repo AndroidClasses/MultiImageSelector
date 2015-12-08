@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -411,7 +412,7 @@ public class MultiImageSelectorFragment extends AppFragment {
                 } else {
                     // 判断选择数量问题
                     if (result == 0) {
-                        Toast.makeText(getActivity(), R.string.msg_amount_limit, Toast.LENGTH_SHORT).show();
+                        showSelectedLimitationPrompt(mDesireImageCount);
                         return;
                     }
 

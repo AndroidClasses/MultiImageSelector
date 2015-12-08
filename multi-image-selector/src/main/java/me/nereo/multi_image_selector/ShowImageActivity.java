@@ -145,11 +145,14 @@ public class ShowImageActivity extends AppActivity {
 				int currentItem = pager.getCurrentItem();
 				String currentUrl = mAllImageUrl.get(currentItem);
 				if (isChecked) {
-					mImageSelection.setSelected(currentUrl);
-//					mSelectedUrl.add(currentUrl);
+					if (mImageSelection.getSelectedCount() < mDefaultCount) {
+						mImageSelection.setSelected(currentUrl);
+					} else {
+						showSelectedLimitationPrompt(pager, mDefaultCount);
+						mPageCheckMask.setChecked(false);
+					}
 				} else {
 					mImageSelection.clearSelected(currentUrl);
-//					mSelectedUrl.remove(currentUrl);
 				}
 				refreshWithResultUi();
 			}

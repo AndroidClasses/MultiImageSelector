@@ -1,8 +1,10 @@
 package me.nereo.multi_image_selector;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -59,5 +61,10 @@ public class AppFragment extends Fragment {
 
     public static <T extends View> T  findById(View view, int resId) {
         return ButterKnife.findById(view, resId);
+    }
+
+    protected void showSelectedLimitationPrompt(int maxCount) {
+        String prompt = getString(R.string.msg_amount_limit, maxCount);
+        Snackbar.make(getView(), prompt, Snackbar.LENGTH_SHORT).show();
     }
 }
